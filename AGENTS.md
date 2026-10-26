@@ -141,7 +141,8 @@ apps/identity/src/
 - 先运行受影响 package 的类型、lint、测试与构建，再根据共享模块和任务入口的变化扩展验证。
 - 较大变更交付前运行 `mise run verify`；新应用还需要实际 HTTP smoke 与 OpenNext/Workers 本地预览验证。
 - `next build`、OpenNext build、Wrangler dry-run、本地预览、真实第三方联调和云端部署是不同证据。没有配置真实 Logto/Creem 账号、远端 D1 与域名时，明确报告尚未验证的部分；历史 Stripe 验收与当前新购买链路分别记录。
-- 不覆盖其他未提交改动，不自行提交或推送；用户要求提交时使用 Conventional Commits，并确保相关检查通过。
+- 本项目由用户单人开发维护。后续功能开发默认直接在 `main` 分支进行；完成适用检查后，使用 Conventional Commits 提交并推送到 `origin/main`。仅在用户当次明确要求时新建或使用其他开发分支；用户要求先评审、仅本地修改或暂不提交/推送时，遵循当次要求。
+- 不覆盖或提交与当前任务无关的其他改动。
 - 不提交 `.next`、`.open-next`、`.wrangler`、`dist`、coverage、本地环境文件、令牌和密钥。
 
 ## 命令入口

@@ -11,6 +11,7 @@ export const HTTP_ERROR_CODES = {
   invalid_app_url: 1006,
   session_renewal_failed: 1007,
   session_busy: 1008,
+  invalid_billing_mode: 1009,
   invalid_origin: 2001,
   unauthenticated: 2002,
   premium_required: 2003,
@@ -30,6 +31,7 @@ export const HTTP_ERROR_CODES = {
   invalid_webhook_signature: 4002,
   missing_webhook_signature: 4003,
   webhook_too_large: 4004,
+  billing_mode_mismatch: 4005,
 } as const;
 
 export type ApiErrorType = keyof typeof HTTP_ERROR_CODES;

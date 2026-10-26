@@ -3,6 +3,8 @@ import { NextIntlClientProvider } from "@hotkey-tools/i18n";
 import { describe, expect, it, vi } from "vitest";
 import zh from "../../../../../../packages/i18n/messages/zh/sign-in.json";
 import en from "../../../../../../packages/i18n/messages/en/sign-in.json";
+import zhCommon from "../../../../../../packages/i18n/messages/zh/common.json";
+import enCommon from "../../../../../../packages/i18n/messages/en/common.json";
 import { SignInPage } from "./sign-in-page";
 
 const preference = vi.hoisted(() => ({ locale: "zh" as "zh" | "en" }));
@@ -22,7 +24,11 @@ describe("login page composition", () => {
         "https://login.loom-labs.ai/api/auth/login?provider=google&returnTo=https%3A%2F%2Fwww.loom-labs.ai%2Fworkspace%3Fsource%3Dlogin";
       const github = google.replace("provider=google", "provider=github");
       const markup = renderToStaticMarkup(
-        <NextIntlClientProvider locale={locale} messages={{ SignIn: messages }} timeZone="UTC">
+        <NextIntlClientProvider
+          locale={locale}
+          messages={{ SignIn: messages, Common: locale === "en" ? enCommon : zhCommon }}
+          timeZone="UTC"
+        >
           <SignInPage googleSignInUrl={google} githubSignInUrl={github} />
         </NextIntlClientProvider>,
       );
@@ -35,6 +41,9 @@ describe("login page composition", () => {
       expect(markup).toContain(`href="https://www.loom-labs.ai/${locale === "zh" ? "zh" : ""}"`);
       expect(markup).toContain(`href="${google.replaceAll("&", "&amp;")}"`);
       expect(markup).toContain(`href="${github.replaceAll("&", "&amp;")}"`);
+      const legalPrefix = `https://www.loom-labs.ai${locale === "zh" ? "/zh" : ""}`;
+      expect(markup).toContain(`href="${legalPrefix}/privacy"`);
+      expect(markup).toContain(`href="${legalPrefix}/terms"`);
       expect(markup).not.toContain('href="#');
     },
   );

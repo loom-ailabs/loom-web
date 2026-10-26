@@ -7,7 +7,7 @@ export function IntelligenceWeave() {
   return (
     <div
       ref={rootRef}
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="loom-weave-field pointer-events-none absolute inset-0 overflow-hidden"
       data-loom-weave
       data-weave-state="fallback"
       data-weave-drawn="false"

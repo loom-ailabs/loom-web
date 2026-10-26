@@ -27,7 +27,7 @@ import {
 } from "./billing";
 import { ApiError } from "./http";
 
-describe("Sandbox configuration and webhook signatures", () => {
+describe("Billing configuration and webhook signatures", () => {
   const validEnvironment = {
     APP_URL: config.appUrl,
     STRIPE_SECRET_KEY: config.secretKey,
@@ -38,7 +38,7 @@ describe("Sandbox configuration and webhook signatures", () => {
     environmentBinding.value = { ...validEnvironment };
   });
 
-  it("fails closed when configuration is missing or a live key is supplied", () => {
+  it("fails closed when configuration is missing or a live key is supplied without live mode", () => {
     expect(() => getBillingConfig({})).toThrow(ApiError);
     expect(() =>
       getBillingConfig({
@@ -47,7 +47,7 @@ describe("Sandbox configuration and webhook signatures", () => {
         STRIPE_WEBHOOK_SECRET: config.webhookSecret,
         STRIPE_PRICE_ID: config.priceId,
       }),
-    ).toThrow("Sandbox");
+    ).toThrow("支付模式");
   });
 
   it.each(Object.keys(validEnvironment))("rejects a missing %s before using Stripe", (name) => {
@@ -59,7 +59,7 @@ describe("Sandbox configuration and webhook signatures", () => {
   it("rejects malformed webhook secret or price id and accepts the configured origin", () => {
     expect(() =>
       getBillingConfig({ ...validEnvironment, STRIPE_WEBHOOK_SECRET: "other-secret" }),
-    ).toThrow("Sandbox");
+    ).toThrow("回调密钥");
     expect(() =>
       getBillingConfig({ ...validEnvironment, STRIPE_PRICE_ID: "prod_wrong_kind" }),
     ).toThrow("单次固定价格");
@@ -67,6 +67,61 @@ describe("Sandbox configuration and webhook signatures", () => {
       config,
     );
   });
+
+  it.each(["", "LIVE", " test", "sandbox"])(
+    "rejects an invalid explicit billing mode %j",
+    (mode) => {
+      expect(() => getBillingConfig({ ...validEnvironment, STRIPE_MODE: mode })).toThrow(
+        expect.objectContaining({ status: 503, code: "invalid_billing_mode" }),
+      );
+    },
+  );
+
+  it.each(["test", "live"] as const)(
+    "authenticates %s webhooks only with that endpoint's signing secret",
+    async (mode) => {
+      const secret = `whsec_${mode}_offline_endpoint`;
+      environmentBinding.value = {
+        ...validEnvironment,
+        STRIPE_MODE: mode,
+        STRIPE_SECRET_KEY: `sk_${mode}_offline_fixture`,
+        STRIPE_WEBHOOK_SECRET: secret,
+      };
+      const db = new SQLiteD1();
+      databaseBinding.value = db.binding();
+      const stripe = createStripeClient(environmentBinding.value.STRIPE_SECRET_KEY!);
+      const payload = JSON.stringify({
+        id: "evt_endpoint_mode",
+        type: "customer.created",
+        livemode: mode === "live",
+        data: { object: { id: "cus_fixture" } },
+      });
+      try {
+        for (const signingSecret of [secret, "whsec_other_endpoint"]) {
+          const signature = stripe.webhooks.generateTestHeaderString({
+            payload,
+            secret: signingSecret,
+          });
+          const request = new Request("https://app.example/api/webhooks/stripe", {
+            method: "POST",
+            headers: { "stripe-signature": signature },
+            body: payload,
+          });
+          if (signingSecret === secret)
+            await expect(handleStripeWebhook(request)).resolves.toEqual({
+              received: true,
+              ignored: true,
+            });
+          else
+            await expect(handleStripeWebhook(request)).rejects.toMatchObject({
+              code: "invalid_webhook_signature",
+            });
+        }
+      } finally {
+        db.raw.close();
+      }
+    },
+  );
 
   it("constructs a Sandbox service lazily for the public checkout function", async () => {
     const db = new SQLiteD1();
@@ -141,7 +196,7 @@ describe("Sandbox configuration and webhook signatures", () => {
         if (livemode)
           await expect(handleStripeWebhook(request)).rejects.toMatchObject({
             status: 400,
-            code: "sandbox_required",
+            code: "billing_mode_mismatch",
           });
         else expect(await handleStripeWebhook(request)).toEqual({ received: true, ignored: true });
       }

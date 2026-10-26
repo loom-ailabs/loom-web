@@ -43,7 +43,10 @@ describe("Payment validation", () => {
       if (mismatch === "live") fixture.session.livemode = true;
       await expect(
         new BillingService(db.binding(), fixture.stripe, config).handleEvent(completedEvent()),
-      ).rejects.toMatchObject({ status: 400, code: "payment_mismatch" });
+      ).rejects.toMatchObject({
+        status: 400,
+        code: mismatch === "live" ? "billing_mode_mismatch" : "payment_mismatch",
+      });
       expect(await hasPremium("alice")).toBe(false);
       expect(db.raw.prepare("SELECT count(*) AS total FROM stripe_events").get()?.total).toBe(0);
     },
@@ -65,7 +68,9 @@ describe("Payment validation", () => {
           ...completedEvent(),
           type: "checkout.session.expired",
         } as Stripe.Event),
-      ).rejects.toMatchObject({ code: "payment_mismatch" });
+      ).rejects.toMatchObject({
+        code: mismatch === "live" ? "billing_mode_mismatch" : "payment_mismatch",
+      });
       expect(db.raw.prepare("SELECT status FROM orders").get()?.status).toBe("pending");
     },
   );
@@ -185,12 +190,15 @@ describe("Payment validation", () => {
         fixture.session.payment_status = "unpaid";
       },
     ],
-  ] as const)("does not grant access for a mismatched %s", async (_label, alter) => {
+  ] as const)("does not grant access for a mismatched %s", async (label, alter) => {
     const fixture = stripeFixture(seedOrder(db));
     alter(fixture);
     await expect(
       new BillingService(db.binding(), fixture.stripe, config).handleEvent(completedEvent()),
-    ).rejects.toMatchObject({ status: 400, code: "payment_mismatch" });
+    ).rejects.toMatchObject({
+      status: 400,
+      code: label === "live payment intent" ? "billing_mode_mismatch" : "payment_mismatch",
+    });
     expect(await hasPremium("alice")).toBe(false);
     expect(db.raw.prepare("SELECT count(*) AS total FROM stripe_events").get()?.total).toBe(0);
   });
@@ -226,7 +234,12 @@ describe("Payment validation", () => {
       await expect(
         new BillingService(db.binding(), fixture.stripe, config).handleEvent(refundEvent()),
       ).rejects.toMatchObject({
-        code: kind === "missing order" ? "order_unavailable" : "payment_mismatch",
+        code:
+          kind === "missing order"
+            ? "order_unavailable"
+            : kind === "live"
+              ? "billing_mode_mismatch"
+              : "payment_mismatch",
       });
       expect(await hasPremium("alice")).toBe(false);
     },

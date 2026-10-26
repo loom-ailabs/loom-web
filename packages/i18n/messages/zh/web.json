@@ -24,7 +24,6 @@
   "pricingTitle": "选择适合你的起点，",
   "pricingAccent": "让想法继续生长。",
   "pricingBody": "从免费探索到解锁工作计划，选择适合你的工作方式。",
-  "sandboxNotice": "当前付款仅用于测试，不会产生真实扣款。",
   "exploreBody": "从认识你的新伙伴开始。",
   "free": "免费",
   "exploreBenefit1": "探索产品愿景与工作区",
@@ -32,7 +31,6 @@
   "exploreBenefit3": "在熟悉的工具之间想象新连接",
   "startExploring": "开始探索",
   "proBody": "让创意有清晰的行动路径。",
-  "testPayment": "USD · 一次性测试付款",
   "proBenefit1": "解锁创意工具工作计划",
   "proBenefit2": "同一账号，跨产品保留访问权限",
   "proBenefit3": "一次性购买，无订阅或自动续费",
@@ -102,5 +100,17 @@
   "errorAuth": "请先登录后继续。",
   "errorPremium": "解锁 Loom Pro 后即可查看工作计划。",
   "errorBusy": "账号正在同步，请稍后重试。",
-  "paymentMode": "测试支付"
+  "billing": {
+    "test": {
+      "notice": "当前付款仅用于测试，通过 Creem 测试模式完成，不会产生真实扣款。",
+      "label": "USD · 一次性测试付款",
+      "mode": "Creem 测试模式"
+    },
+    "live": {
+      "notice": "一次性购买 USD 1.00，由 Creem 托管收银台安全收款，无订阅或自动续费。",
+      "label": "USD · 一次性购买",
+      "mode": "一次性购买"
+    }
+  },
+  "errorConfiguration": "付款配置暂不可用，请稍后再试。"
 }

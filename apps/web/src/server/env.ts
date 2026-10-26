@@ -13,6 +13,8 @@ export type WebEnv = {
   LOGTO_APP_SECRET?: string;
   LOGTO_COOKIE_SECRET?: string;
   LOGTO_COOKIE_DOMAIN?: string;
+  STRIPE_MODE?: string;
+  CREEM_MODE?: string;
 };
 
 declare global {
@@ -29,6 +31,8 @@ const variableNames = [
   "LOGTO_APP_SECRET",
   "LOGTO_COOKIE_SECRET",
   "LOGTO_COOKIE_DOMAIN",
+  "STRIPE_MODE",
+  "CREEM_MODE",
 ] as const;
 
 export async function getEnv(): Promise<WebEnv> {
@@ -36,7 +40,10 @@ export async function getEnv(): Promise<WebEnv> {
   const result: WebEnv = { DB: env.DB };
   for (const name of variableNames) {
     // Blank template values in .dev.vars must not hide next dev's .env.local.
-    result[name] = env[name] || process.env[name];
+    result[name] =
+      name === "STRIPE_MODE" || name === "CREEM_MODE"
+        ? (env[name] ?? process.env[name])
+        : env[name] || process.env[name];
   }
   return result;
 }

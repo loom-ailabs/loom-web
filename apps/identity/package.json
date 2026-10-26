@@ -17,16 +17,17 @@
     "preview": "pnpm db:migrate:preview && pnpm cf:build && opennextjs-cloudflare preview --env preview --local --port 3001 --inspector-port 9301 --var APP_URL:http://localhost:3001 --var LOGIN_URL:http://localhost:3001 --var AUTH_SUCCESS_URL:http://localhost:3000/",
     "deploy": "node scripts/check-cloudflare.mjs && pnpm cf:build && opennextjs-cloudflare deploy",
     "deploy:dry-run": "pnpm cf:build && wrangler deploy --dry-run --outdir dist",
-    "db:create": "wrangler d1 create hotkey-tools-identity",
-    "db:migrate:local": "wrangler d1 migrations apply hotkey-tools-identity --local",
-    "db:migrate:preview": "wrangler d1 migrations apply hotkey-tools-identity --local --env preview",
-    "db:migrate": "node scripts/check-cloudflare.mjs && wrangler d1 migrations apply hotkey-tools-identity --remote"
+    "db:create": "wrangler d1 create loom-identity-production --update-config=false",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:preview": "wrangler d1 migrations apply DB --local --env preview",
+    "db:migrate": "node scripts/check-cloudflare.mjs && wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
     "@hotkey-tools/i18n": "workspace:*",
     "@hotkey-tools/identity-core": "workspace:*",
     "@hotkey-tools/ui": "workspace:*",
     "@opennextjs/cloudflare": "1.20.13",
+    "creem": "1.13.0",
     "jose": "5.10.0",
     "lucide-react": "^1.61.0",
     "next": "16.4.2",

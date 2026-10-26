@@ -5,6 +5,7 @@
   "description": "管理你的 Loom 账号和功能访问权限。",
   "security": "安全登录 · 托管收银台 · 使用权限随账号保存",
   "back": "返回 Loom 工作区",
+  "headshotPacks": "职业形象照套餐",
   "settings": "偏好设置",
   "theme": "外观",
   "light": "浅色",
@@ -43,7 +44,6 @@
   "waiting": "请稍候…",
   "checkout": "前往收银台",
   "signInAndUnlock": "登录并解锁",
-  "paymentDisclaimer": "测试支付 · 不会真实扣款。测试金额以收银台为准。",
   "benefits": {
     "account": "购买记录关联当前账号",
     "confirmation": "付款确认后自动开通",
@@ -66,7 +66,6 @@
     "purchase": "暂时无法发起购买，请稍后重试。",
     "premium": "暂时无法使用该功能，请稍后重试。",
     "configuration": "服务尚未配置完成，请稍后再试。",
-    "sandbox": "测试付款配置暂不可用，请稍后再试。",
     "authentication": "登录已失效，请重新登录。",
     "busy": "登录状态正在更新，请稍后刷新重试。",
     "permission": "请先解锁 Loom Pro，再使用高级功能。",
@@ -76,5 +75,15 @@
     "checkoutUnavailable": "收银台暂时不可用，请稍后重试。",
     "alreadyUnlocked": "账号已有使用权限，请刷新状态。",
     "unavailable": "服务暂时不可用，请稍后重试。"
+  },
+  "billing": {
+    "test": {
+      "mode": "Creem 测试模式",
+      "disclaimer": "USD 1.00 · 测试支付，不会真实扣款。由 Creem 托管收银台，无订阅或自动续费。"
+    },
+    "live": {
+      "mode": "一次性购买",
+      "disclaimer": "USD 1.00 · 一次性购买。通过 Creem 托管收银台安全付款，无订阅或自动续费。"
+    }
   }
 }

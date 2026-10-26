@@ -1,12 +1,14 @@
 # Logto 托管认证页品牌配置
 
-本轮只调整 Logto 开发租户 `kpy72v` 的托管认证页面，与 Loom 的浅深主题保持连续。生产租户未改动；不启用 Pro、Bring your UI 或隐藏 Logto 标识。官方当前定价列有免费 Custom CSS、Logo/Favicon 和深色模式能力，本轮实际配置不等于已完成生产 Free 租户验收。[Logto 定价](https://logto.io/pricing)
+Logto 生产 Free 租户 `5z8hdi` 已保存并重载 Loom 品牌配置：Dark mode 开启、浅色主色 `#3A72B3`、深色主色 `#8BBFFF`，复用 [logto-branding.css](logto-branding.css)。未上传原生 Company logo/Favicon，未启用 Pro、Bring your UI 或隐藏 Logto 标识。完整生产授权流程仍在联调，不能把保存和重载当作所有托管页面的真实验收。当前版本与结果集中见[生产切换说明](production-cutover.md)。[Logto 定价](https://logto.io/pricing)
 
-## 已保存配置与实际效果
+以下开发租户 `kpy72v` 的计算样式、截图和原始回滚值保留为历史效果记录，不移作生产截图或生产变更前基线。
+
+## 开发租户历史配置与实际效果
 
 维护者已在 **Sign-in & account → Branding** 保存下列设置，重载后核对已保存 CSS。最终样式使用 `html[data-theme] body` 提高正文规则优先级，加载装饰顶部为 `3rem`。浅色预览的计算背景为 `oklch(0.99 0.004 250)`；真实 `/direct/social/github` 页面为深色，存在 `style[data-custom-css]`，计算背景为 `rgb(24, 24, 24)`，加载装饰顶部为 48px；GitHub 回调也已观察到内联 CSS 与 Loom 标识。验证只覆盖已观察页面，不据此保证所有托管页面都采用同一布局。
 
-| 配置                        | 本轮值                                   | 变更前值       |
+| 配置                        | 开发租户历史值                           | 开发变更前值   |
 | --------------------------- | ---------------------------------------- | -------------- |
 | 浅色主色                    | `#3A72B3`                                | 主色 `#6139F6` |
 | 深色主色                    | `#8BBFFF`                                | 深色模式关闭   |
@@ -24,6 +26,6 @@ Custom CSS 只接受样式，不插入 HTML 或 JavaScript。托管 DOM 和类�
 
 应用只从唯一且有效的 `LOOM_THEME` Cookie 读取 `light` 或 `dark`，通过官方 SDK 的 `extraParams.theme` 传递；`system`、缺失、无效或重复值均省略，不接受 query 覆盖。Logto 官方新增的 `theme=light|dark` 参数控制托管流程外观，配合租户启用的深色模式使用；它不改变 state、PKCE、令牌验证或返回地址规则。[官方更新说明](https://blog.logto.io/changelogs/2026-september)
 
-## 回滚
+## 品牌回滚
 
-在同一开发租户的 Branding 页面清空 Custom CSS，将主色恢复为 `#6139F6`，关闭 Dark mode 并保存；原生 Logo/Favicon 字段未完成变更，无需宣称存在可回滚的新图片。随后分别用浅色、深色偏好检查托管登录、错误和账号关联页面。回滚仅涉及显示配置，不修改身份源、客户端凭据、回调地址或 D1 会话。
+此前开发租户的回滚方式是在该租户 Branding 页面清空 Custom CSS，将主色恢复为 `#6139F6`，关闭 Dark mode 并保存。生产品牌回滚应使用生产配置自身的变更前记录，不把开发基线套用到生产；原生 Logo/Favicon 未上传，没有本轮新增原生图片需要撤销。随后分别用浅色、深色偏好检查托管登录、错误和账号关联页面。品牌回滚仅涉及显示，不修改身份源、客户端凭据、回调地址或 D1 会话，也不等于应用切回开发租户。

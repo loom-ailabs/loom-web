@@ -59,8 +59,8 @@ export function PreferencesMenuItems({ locale, onLocaleChange, labels }: Prefere
               if (value === "zh" || value === "en") onLocaleChange(value);
             }}
           >
-            <DropdownMenuRadioItem value="zh">简体中文</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="zh">简体中文</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuSubContent>
       </DropdownMenuSub>

@@ -23,6 +23,7 @@ class AccessError extends Error {
     super("access_request_failed");
   }
 }
+const billingConfigurationErrors = new Set(["invalid_billing_mode", "billing_mode_mismatch"]);
 async function readApi<T>(path: string): Promise<T> {
   const response = await fetch(path, { cache: "no-store", credentials: "same-origin" });
   const value: unknown = await response.json();
@@ -63,9 +64,11 @@ function useProductAccessState() {
         setProfile(null);
         setUnlocked(false);
         setError(
-          cause instanceof AccessError && cause.type === "session_busy"
-            ? t("errorBusy")
-            : t("errorAccount"),
+          cause instanceof AccessError && billingConfigurationErrors.has(cause.type ?? "")
+            ? t("errorConfiguration")
+            : cause instanceof AccessError && cause.type === "session_busy"
+              ? t("errorBusy")
+              : t("errorAccount"),
         );
       }
     } finally {
@@ -108,13 +111,15 @@ function useProductAccessState() {
       if (recoveryRevision !== requestRevision.current) return;
       const kind = cause instanceof AccessError ? cause.type : undefined;
       setError(
-        kind === "premium_required"
-          ? t("errorPremium")
-          : kind === "unauthenticated" || kind === "session_renewal_failed"
-            ? t("errorAuth")
-            : kind === "session_busy"
-              ? t("errorBusy")
-              : t("errorPlan"),
+        billingConfigurationErrors.has(kind ?? "")
+          ? t("errorConfiguration")
+          : kind === "premium_required"
+            ? t("errorPremium")
+            : kind === "unauthenticated" || kind === "session_renewal_failed"
+              ? t("errorAuth")
+              : kind === "session_busy"
+                ? t("errorBusy")
+                : t("errorPlan"),
       );
     } finally {
       setRunning(false);

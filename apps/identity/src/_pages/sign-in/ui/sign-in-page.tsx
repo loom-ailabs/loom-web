@@ -16,6 +16,7 @@ export type SignInPageProps = {
 
 export function SignInPage({ googleSignInUrl, githubSignInUrl, notice }: SignInPageProps) {
   const t = useTranslations("SignIn.login");
+  const common = useTranslations("Common");
   const { locale, switchLocale } = useLocaleSwitcher();
   const homeUrl = localizeUrl("https://www.loom-labs.ai/", locale);
   return (
@@ -107,6 +108,20 @@ export function SignInPage({ googleSignInUrl, githubSignInUrl, notice }: SignInP
         </main>
         <footer className="flex flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} Loom AI</span>
+          <nav aria-label={common("legalLinks")} className="flex flex-wrap items-center gap-4">
+            <a
+              href={localizeUrl("https://www.loom-labs.ai/privacy", locale)}
+              className="rounded-md hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              {common("privacy")}
+            </a>
+            <a
+              href={localizeUrl("https://www.loom-labs.ai/terms", locale)}
+              className="rounded-md hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              {common("terms")}
+            </a>
+          </nav>
           <a
             href={homeUrl}
             className="inline-flex items-center gap-1.5 rounded-md outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"

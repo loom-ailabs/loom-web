@@ -5,6 +5,10 @@ const loginBase = new URL(
   process.env.LOGIN_SMOKE_URL ??
     (baseUrl.hostname === "localhost" ? "http://localhost:3001" : "https://login.loom-labs.ai"),
 );
+const logtoEndpoint = new URL(
+  process.env.LOGTO_SMOKE_ENDPOINT ??
+    (baseUrl.hostname === "localhost" ? "https://auth.loom-labs.ai" : "https://5z8hdi.logto.app"),
+);
 const checks = [];
 async function api(path, status) {
   const response = await fetch(new URL(path, baseUrl), { redirect: "manual" });
@@ -40,8 +44,8 @@ const legacy = await fetch(new URL("/en/workspace?source=legacy&keep=a%2Bb", bas
   redirect: "manual",
 });
 assert.equal(legacy.status, 307);
-assert.equal(new URL(legacy.headers.get("location")).pathname, "/workspace");
-assert.equal(new URL(legacy.headers.get("location")).search, "?source=legacy&keep=a%2Bb");
+assert.equal(new URL(legacy.headers.get("location"), baseUrl).pathname, "/workspace");
+assert.equal(new URL(legacy.headers.get("location"), baseUrl).search, "?source=legacy&keep=a%2Bb");
 checks.push({ path: "/en/workspace", status: 307, rawQueryPreserved: true });
 for (const prefix of ["/en", "/zh"]) {
   const response = await fetch(new URL(`${prefix}/api/me`, baseUrl), { redirect: "manual" });
@@ -104,7 +108,7 @@ for (const provider of ["google", "github"]) {
   );
   assert.equal(response.status, 303);
   const target = new URL(response.headers.get("location"));
-  assert.equal(target.origin, "https://auth.loom-labs.ai");
+  assert.equal(target.origin, logtoEndpoint.origin);
   assert.equal(
     target.searchParams.get("redirect_uri"),
     new URL("/api/auth/callback", loginBase).toString(),

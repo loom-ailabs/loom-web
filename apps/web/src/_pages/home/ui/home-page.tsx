@@ -1,6 +1,7 @@
 "use client";
 
 import { localizeUrl } from "@hotkey-tools/i18n/routing";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 
 import Image from "next/image";
 import { Button, GlassSurface } from "@hotkey-tools/ui";
@@ -49,9 +50,16 @@ function Brand({ compact = false }: { compact?: boolean }) {
 }
 
 type ProductView = "home" | "vision" | "workspace" | "pricing" | "account";
-export function HomePage({ view = "home" }: { view?: ProductView }) {
+export function HomePage({
+  view = "home",
+  billingMode,
+}: {
+  view?: ProductView;
+  billingMode: PaymentMode;
+}) {
   const t = useTranslations("Web");
   const locale = useLocale();
+  const common = useTranslations("Common");
   const access = useProductAccess();
   const premium = access.profile?.entitlements.premium ?? false;
   const checkoutUrl = localizeUrl("https://checkout.loom-labs.ai/", locale);
@@ -159,7 +167,9 @@ export function HomePage({ view = "home" }: { view?: ProductView }) {
             </div>
           </section>
         )}
-        {(view === "home" || view === "workspace") && <ProductWorkspace access={access} />}
+        {(view === "home" || view === "workspace") && (
+          <ProductWorkspace access={access} billingMode={billingMode} />
+        )}
         {(view === "home" || view === "pricing") && (
           <section className="border-t py-20 sm:py-28">
             <div className="grid gap-10 lg:grid-cols-3">
@@ -175,7 +185,9 @@ export function HomePage({ view = "home" }: { view?: ProductView }) {
                 <p className="mt-5 max-w-xs text-sm leading-7 text-muted-foreground">
                   {t("pricingBody")}
                 </p>
-                <p className="mt-4 text-xs leading-6 text-muted-foreground">{t("sandboxNotice")}</p>
+                <p className="mt-4 text-xs leading-6 text-muted-foreground">
+                  {t(`billing.${billingMode}.notice`)}
+                </p>
               </div>
               <GlassSurface className="flex flex-col p-7">
                 <Box className="size-5 text-muted-foreground" />
@@ -204,13 +216,16 @@ export function HomePage({ view = "home" }: { view?: ProductView }) {
                 <div className="flex items-center justify-between">
                   <Command className="size-5 text-link" />
                   <span className="rounded border border-link/30 bg-primary/10 px-2 py-1 text-xs text-link">
-                    {t("paymentMode")}
+                    {t(`billing.${billingMode}.mode`)}
                   </span>
                 </div>
                 <h3 className="mt-5 text-lg font-medium">Loom Pro</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{t("proBody")}</p>
                 <p className="mt-7 text-4xl tracking-tight">
-                  $1<span className="ml-2 text-xs text-muted-foreground">{t("testPayment")}</span>
+                  $1
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {t(`billing.${billingMode}.label`)}
+                  </span>
                 </p>
                 <ul className="my-7 space-y-3 text-sm text-muted-foreground">
                   {[t("proBenefit1"), t("proBenefit2"), t("proBenefit3")].map((x) => (
@@ -258,9 +273,20 @@ export function HomePage({ view = "home" }: { view?: ProductView }) {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Loom AI · {t("footerVision")}
           </p>
-          <Link href="/pricing" className="text-xs text-muted-foreground hover:text-foreground">
-            {t("footerLink")}
-          </Link>
+          <nav
+            aria-label={common("legalLinks")}
+            className="flex flex-wrap items-center gap-5 text-xs text-muted-foreground"
+          >
+            <Link href="/pricing" className="hover:text-foreground">
+              {t("footerLink")}
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground">
+              {common("privacy")}
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              {common("terms")}
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>

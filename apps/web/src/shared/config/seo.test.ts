@@ -1,4 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
+const runtime = vi.hoisted(() => ({ mode: "test" as PaymentMode }));
+vi.mock("@/server/billing-presentation", () => ({
+  getBillingPresentationMode: async () => runtime.mode,
+}));
+beforeEach(() => {
+  runtime.mode = "test";
+});
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { GET as getLlmsIndex } from "@/app/llms.txt/route";
@@ -19,6 +27,8 @@ const publicUrls = [
   "https://www.loom-labs.ai/vision",
   "https://www.loom-labs.ai/workspace",
   "https://www.loom-labs.ai/pricing",
+  "https://www.loom-labs.ai/privacy",
+  "https://www.loom-labs.ai/terms",
 ];
 const chineseUrl = (url: string) =>
   url === publicUrls[0]
@@ -31,7 +41,7 @@ describe("public search and agent discovery", () => {
     expect(entries.map((entry) => entry.url)).toEqual(
       publicUrls.flatMap((url) => [url, chineseUrl(url)]),
     );
-    expect(entries).toHaveLength(8);
+    expect(entries).toHaveLength(12);
     expect(entries.every((entry) => !entry.url.includes("/account"))).toBe(true);
     for (const [index, entry] of entries.entries()) {
       const english = publicUrls[Math.floor(index / 2)]!;
@@ -71,11 +81,11 @@ describe("public search and agent discovery", () => {
       expect(chinese.description).not.toBe(metadata.description);
       titles.add(JSON.stringify(metadata.title));
     }
-    expect(titles.size).toBe(4);
+    expect(titles.size).toBe(6);
   });
 
   it("keeps root public text permanently English regardless of language preference", async () => {
-    const responses = [getLlmsIndex(), getLlmsFullText()];
+    const responses = await Promise.all([getLlmsIndex(), getLlmsFullText()]);
     const texts = [createLlmsIndex("en"), createLlmsFullText("en")];
     for (const [index, response] of responses.entries()) {
       expect(response.status).toBe(200);
@@ -129,5 +139,48 @@ describe("public search and agent discovery", () => {
     expect(JSON.stringify(structuredData)).not.toMatch(
       /Offer|AggregateRating|Review|priceCurrency/,
     );
+  });
+
+  it.each(["en", "zh"] as const)(
+    "keeps metadata and public text accurate for test/live %s requests",
+    async (locale) => {
+      for (const mode of ["test", "live"] as const) {
+        runtime.mode = mode;
+        const metadata = createPageMetadata("/pricing", locale, mode);
+        const expectedTest = /test|Test|测试/;
+        const content = [
+          metadata.description,
+          createLlmsIndex(locale, mode),
+          createLlmsFullText(locale, mode),
+        ].join("\n");
+        expect(content).toContain("USD 1.00");
+        if (mode === "test") expect(content).toMatch(expectedTest);
+        else expect(content).not.toMatch(/Sandbox|test|Test|no real charge|不会真实扣款|测试/);
+        const request = new Request(`https://www.loom-labs.ai/${locale}/llms.txt`);
+        for (const get of [getLocalizedIndex, getLocalizedFullText]) {
+          const response = await get(request, { params: Promise.resolve({ locale }) });
+          const text = await response.text();
+          expect(text).toBe(
+            get === getLocalizedIndex
+              ? createLlmsIndex(locale, mode)
+              : createLlmsFullText(locale, mode),
+          );
+          expect(response.headers.get("Cache-Control")).toContain("must-revalidate");
+        }
+      }
+    },
+  );
+
+  it("reads runtime mode for each root text request rather than freezing a build-time payment claim", async () => {
+    const test = await (await getLlmsFullText()).text();
+    expect(test).toContain("Creem Test mode");
+    expect(test).not.toContain("Stripe");
+    runtime.mode = "live";
+    const live = await (await getLlmsFullText()).text();
+    expect(live).toContain("USD 1.00");
+    expect(live).not.toMatch(/Sandbox|test|no real charge/);
+    expect(await (await getLlmsIndex()).text()).not.toMatch(/test mode|no real charge/);
+    runtime.mode = "test";
+    expect(await (await getLlmsFullText()).text()).toBe(test);
   });
 });

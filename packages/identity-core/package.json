@@ -9,6 +9,8 @@
     "./http": "./src/http.ts",
     "./http-codes": "./src/http-codes.ts",
     "./contract": "./src/contract.ts",
+    "./billing-mode": "./src/billing-mode.ts",
+    "./billing-types": "./src/billing-types.ts",
     "./entitlements": "./src/entitlements.ts",
     "./session": "./src/session.ts",
     "./return-target": "./src/return-target.ts"

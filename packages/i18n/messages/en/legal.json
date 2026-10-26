@@ -1,0 +1,126 @@
+{
+  "common": {
+    "home": "Loom AI home",
+    "navigation": "Privacy and terms",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "contact": "Contact",
+    "updated": "Last updated",
+    "date": "October 26, 2026"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lead": "This notice explains how the Loom AI website, sign-in service, and test checkout handle information. Loom AI is the product brand used on this site. For privacy questions or account requests, contact boylucky2012@gmail.com.",
+    "sections": [
+      {
+        "id": "sign_in",
+        "title": "Sign-in and account information",
+        "paragraphs": [
+          "When you choose Google or GitHub sign-in, that provider shares the basic profile and email information you authorize with Logto, which provides our identity service. This can include a stable account identifier, name, email address, and profile picture. The available fields depend on your provider and authorization. Your provider handles your password; Loom does not ask you to provide it.",
+          "Loom uses Google user data only for authentication, maintaining your account, and providing account-related access to Loom services. The current application does not send this data to model services or use it for model training."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Service providers and stored records",
+        "paragraphs": [
+          "Logto processes the sign-in identity and authorization flow. Cloudflare hosts the applications and D1 database. D1 stores account identifiers, names and email addresses when supplied, encrypted session-token state, and order and access records. The application does not store session tokens in browser cookies.",
+          "For current test checkouts, Loom sends Creem the order and account identifiers, product information, amount, and currency. Creem hosts checkout in Test mode and processes the information entered there. Historical Stripe Sandbox orders and webhook records are retained for reconciliation, refunds, and access-revocation handling. These providers process information needed to provide their respective services."
+        ]
+      },
+      {
+        "id": "cookies",
+        "title": "Cookies and shared sign-in",
+        "paragraphs": [
+          "The sign-in cookie contains a random session identifier, rather than your profile or tokens. It is Secure, HttpOnly, and SameSite=Lax on HTTPS and is sent to subdomains of .loom-labs.ai for shared sign-in. Those subdomains are part of the same session trust boundary.",
+          "A session has an absolute limit of 14 days from successful sign-in. Signing out, revocation, provider failure, or a security check can end access earlier. Temporary sign-in flow cookies last up to 10 minutes. Language and appearance preference cookies can last one year; they contain preference values, not identity or purchase rights."
+        ]
+      },
+      {
+        "id": "payments",
+        "title": "Test payments and current product scope",
+        "paragraphs": [
+          "Payments currently use Creem Test mode and do not charge real money. Use Creem test payment details. Test order and access records support testing and are separate from live payments.",
+          "The available work plan is curated, static reading and planning content. It does not call a model, create files, or perform external actions on your behalf.",
+          "Professional Headshot Pack purchases currently record test package entitlements only. Photo upload, generation, and downloads are not available yet."
+        ]
+      },
+      {
+        "id": "operations",
+        "title": "Operational information",
+        "paragraphs": [
+          "Loom and its infrastructure providers may process request, error, and security-related technical information to operate and protect the service. This notice does not claim that no logs exist. The current site does not add advertising, marketing, or behavioral analytics trackers."
+        ]
+      },
+      {
+        "id": "choices",
+        "title": "Your choices and deletion requests",
+        "paragraphs": [
+          "Signing out revokes the current shared session; it does not delete your account. You can also manage Loom authorization in your Google or GitHub account settings. Provider authorization changes do not themselves delete records held by Loom.",
+          "To request account access, correction, or deletion, email boylucky2012@gmail.com. The administrator will need to verify that the account belongs to you before processing the request. Account, order, and security records are handled according to the actual service need and applicable requirements. There is no single automatic deletion mechanism covering all records, and this notice does not promise deletion when a session expires or when you sign out."
+        ]
+      },
+      {
+        "id": "updates",
+        "title": "Changes to these practices",
+        "paragraphs": [
+          "This notice should be updated if the service or its data practices change. A new use of Google user data must be disclosed, with any required authorization obtained before that new use. Contact boylucky2012@gmail.com if anything here is unclear."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "lead": "These rules describe the current scope of the Loom AI website, shared sign-in, and test purchase flow. Questions can be sent to boylucky2012@gmail.com.",
+    "sections": [
+      {
+        "id": "scope",
+        "title": "What the service currently provides",
+        "paragraphs": [
+          "Loom presents its product vision, a workspace introduction, and a curated creative-tool work plan. The work plan is static content for reading and planning. It does not generate model output, create files, or execute tasks in other tools.",
+          "Statements about connecting desktop, browser, and editor workflows describe the product vision. They do not mean that every integration or automated capability is currently available.",
+          "The Professional Headshot Pack is a separate package from Loom Pro. Current testing records payment and entitlements for four portraits and one redo; it does not upload photos, generate portraits, or deliver files."
+        ]
+      },
+      {
+        "id": "account",
+        "title": "Your account and sign-in",
+        "paragraphs": [
+          "Use an account you control when signing in with Google or GitHub. Keep access to that provider account secure. Use the same Loom account to access its associated records and permissions; matching email addresses alone do not automatically merge accounts.",
+          "Loom uses a shared session across its subdomains. A session may end before its maximum lifetime if you sign out, authorization fails, or a security check requires a new sign-in. Signing out is separate from deleting an account."
+        ]
+      },
+      {
+        "id": "sandbox",
+        "title": "Test payments and access",
+        "paragraphs": [
+          "Checkout currently uses Creem Test mode. The displayed USD 1.00 amount for Loom Pro and USD 9.99 amount for the separate Professional Headshot Pack are test amounts and make no real charge. Use Creem test payment details. Access or package entitlements are granted only after server-side payment confirmation, not merely by visiting a success page.",
+          "Test records do not represent a real purchase or a promise of access to future commercial offerings. Test payment, refund, and revocation operations can change test access. These rules do not establish a live purchase or refund policy."
+        ]
+      },
+      {
+        "id": "use",
+        "title": "Use the intended access flow",
+        "paragraphs": [
+          "Use the published sign-in and checkout controls. Do not impersonate another account, access another user’s orders, forge callbacks, bypass permission checks, or abuse the service with unauthorized requests.",
+          "The server checks current identity and permissions for protected operations. A visible button, cached page, or previous access result does not establish current permission."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "External providers and privacy",
+        "paragraphs": [
+          "Sign-in and checkout can take you to Google, GitHub, Logto, or Creem pages. These providers operate their own account and service features. Loom does not manage your provider password or replace your control of those accounts.",
+          "Read the Privacy Policy for information about account data, cookies, service providers, and deletion requests. For account or service questions, contact boylucky2012@gmail.com."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Service changes",
+        "paragraphs": [
+          "The scope and availability of the service can change. Any move from test payments to real payments requires the relevant purchase information and user-facing notices to be updated before the new flow is offered. This page describes the current test flow."
+        ]
+      }
+    ]
+  }
+}

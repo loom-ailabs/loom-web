@@ -1,4 +1,5 @@
 import { readResponse } from "@/shared/api";
+import type { Locale } from "@hotkey-tools/i18n";
 import type { Checkout, Order, Profile } from "../model/types";
 
 export async function fetchProfile(signal?: AbortSignal) {
@@ -12,12 +13,12 @@ export async function fetchOrder(orderId: string, signal?: AbortSignal) {
   return result.order;
 }
 
-export async function createCheckout(requestId: string) {
+export async function createCheckout(requestId: string, locale: Locale) {
   return readResponse<Checkout>(
     await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestId }),
+      body: JSON.stringify({ requestId, locale }),
     }),
   );
 }

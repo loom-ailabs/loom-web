@@ -6,6 +6,7 @@ import { SignInPage } from "@/_pages/sign-in";
 import { getAuthClient, getLoginPageConfig, getUser } from "@/server/auth";
 import { getEnv } from "@/server/env";
 import { ApiError } from "@/server/http";
+import { getBillingPresentationMode } from "@/server/billing-presentation";
 
 export default async function Page({
   searchParams,
@@ -41,5 +42,5 @@ export default async function Page({
       <SignInPage googleSignInUrl={providerUrl("google")} githubSignInUrl={providerUrl("github")} />
     );
   }
-  return <IdentityPage />;
+  return <IdentityPage billingMode={await getBillingPresentationMode()} />;
 }

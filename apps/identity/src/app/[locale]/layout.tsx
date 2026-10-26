@@ -1,3 +1,4 @@
+import { getBillingPresentationMode } from "@/server/billing-presentation";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -29,6 +30,7 @@ export default async function LocaleLayout({
 }: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }> }>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  const billingMode = await getBillingPresentationMode();
   const theme = (await cookies()).get("LOOM_THEME")?.value;
   const initialTheme =
     theme === "light" || theme === "dark" || theme === "system" ? theme : undefined;
@@ -41,7 +43,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider
           locale={locale}
-          messages={await getMessagesForLocale(locale)}
+          messages={await getMessagesForLocale(locale, billingMode)}
           timeZone="UTC"
         >
           <AppearanceProvider initialTheme={initialTheme}>{children}</AppearanceProvider>

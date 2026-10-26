@@ -23,16 +23,33 @@
     "pricing": {
       "title": "方案与定价 · Loom Explore 与 Loom Pro",
       "label": "方案与定价",
-      "description": "免费探索 Loom AI，或一次性解锁 Loom Pro 工作计划。当前 USD 1.00 为测试支付，不会真实扣款。",
-      "content": "Loom Explore 免费开放产品愿景与工作区介绍。Loom Pro 一次性解锁创意工具工作计划，访问权限保存在账号中，无订阅或自动续费。当前 USD 1.00 通过 Stripe Sandbox 完成测试支付，不会真实扣款，该金额并非正式商业售价。"
+      "description": "免费探索 Loom AI，或一次性解锁 Loom Pro 工作计划。当前 USD 1.00 通过 Creem 测试模式支付，不会真实扣款。",
+      "content": "Loom Explore 免费开放产品愿景与工作区介绍。Loom Pro 一次性解锁创意工具工作计划，访问权限保存在账号中，无订阅或自动续费。当前 USD 1.00 通过 Creem 测试模式完成支付，不会真实扣款，该金额并非正式商业售价。"
+    },
+    "privacy": {
+      "title": "隐私说明 · Loom AI",
+      "label": "隐私说明",
+      "description": "了解 Loom AI 如何处理账号资料、共享登录 Cookie、服务供应商和删除请求。",
+      "content": "隐私说明介绍账号数据用途、服务供应商、Cookie 有效期、记录保留方式和删除请求。隐私问题可联系 boylucky2012@gmail.com。"
+    },
+    "terms": {
+      "title": "使用规则 · Loom AI",
+      "label": "使用规则",
+      "description": "了解 Loom AI 网站的服务范围、账号访问、使用规则和联系渠道。",
+      "content": "使用规则说明当前提供的功能、账号使用责任、外部服务供应商和正常访问流程。使用账号和购买功能前可阅读本页。"
     }
   },
-  "boundary": "工作计划由 Loom 整理，供阅读与规划使用，不包含自动执行。当前付款处于测试模式，不会真实扣款。",
+  "boundary": "工作计划由 Loom 整理，供阅读与规划使用，不包含自动执行。当前付款使用 Creem 测试模式，不会真实扣款。",
   "publicPages": "公开页面",
   "publicText": "公开内容正文",
   "textLink": "纯文本说明",
   "textDescription": "产品愿景、工作区与方案的公开说明，不含账户、订单或认证资料。",
   "publicTitle": "公开内容说明",
   "privateBoundary": "本文只描述公开产品内容，不提供个人资料、认证凭据或付费内容。",
-  "pageLabel": "页面"
+  "pageLabel": "页面",
+  "live": {
+    "pricingDescription": "免费探索 Loom AI，或通过 Creem 一次性支付 USD 1.00 解锁 Loom Pro 工作计划，无订阅或自动续费。",
+    "pricingContent": "Loom Explore 免费开放产品愿景与工作区介绍。Loom Pro 通过 Creem 托管收银台一次性购买，价格为 USD 1.00，解锁创意工具工作计划，访问权限保存在账号中，无订阅或自动续费。",
+    "boundary": "工作计划由 Loom 整理，供阅读与规划使用，不包含自动执行。Loom Pro 通过 Creem 托管收银台一次性购买，价格为 USD 1.00。"
+  }
 }

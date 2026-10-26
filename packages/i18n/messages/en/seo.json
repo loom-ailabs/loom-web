@@ -23,16 +23,33 @@
     "pricing": {
       "title": "Plans & Pricing · Loom Explore and Loom Pro",
       "label": "Plans & pricing",
-      "description": "Explore Loom AI for free or unlock the Loom Pro work plan with a one-time purchase. The current USD 1.00 payment is a test and makes no real charge.",
-      "content": "Loom Explore offers free access to the vision and workspace introduction. Loom Pro unlocks the creative-tool work plan with a one-time purchase and saves access to your account, with no subscription or automatic renewal. The current USD 1.00 payment uses Stripe Sandbox and makes no real charge; it is not a commercial price."
+      "description": "Explore Loom AI for free or unlock the Loom Pro work plan with a one-time purchase. The current USD 1.00 payment uses Creem Test mode and makes no real charge.",
+      "content": "Loom Explore offers free access to the vision and workspace introduction. Loom Pro unlocks the creative-tool work plan with a one-time purchase and saves access to your account, with no subscription or automatic renewal. The current USD 1.00 payment uses Creem Test mode and makes no real charge; it is not a commercial price."
+    },
+    "privacy": {
+      "title": "Privacy Policy · Loom AI",
+      "label": "Privacy Policy",
+      "description": "How Loom AI handles account information, shared sign-in cookies, service providers, and deletion requests.",
+      "content": "The Loom AI Privacy Policy explains account data purposes, service providers, cookie lifetimes, retention practices, and deletion requests. Contact boylucky2012@gmail.com for privacy questions."
+    },
+    "terms": {
+      "title": "Terms of Use · Loom AI",
+      "label": "Terms of Use",
+      "description": "Service scope, account access, use rules, and support for the Loom AI website.",
+      "content": "The Loom AI Terms of Use describe available features, account responsibilities, external providers, and the intended access flow. Read the page before using account and purchase features."
     }
   },
-  "boundary": "Work plans are curated by Loom for reading and planning, without automated execution. Payments are currently in test mode and make no real charge.",
+  "boundary": "Work plans are curated by Loom for reading and planning, without automated execution. Payments currently use Creem Test mode and make no real charge.",
   "publicPages": "Public pages",
   "publicText": "Public text",
   "textLink": "Plain-text overview",
   "textDescription": "Public information about the vision, workspace, and plans, without account, order, or authentication data.",
   "publicTitle": "Public content overview",
   "privateBoundary": "This document describes public product information only. It provides no personal data, authentication credentials or paid content.",
-  "pageLabel": "Page"
+  "pageLabel": "Page",
+  "live": {
+    "pricingDescription": "Explore Loom AI for free or unlock the Loom Pro work plan for USD 1.00 with a one-time purchase through Creem. No subscription or automatic renewal.",
+    "pricingContent": "Loom Explore offers free access to the vision and workspace introduction. Loom Pro costs USD 1.00 as a one-time purchase through Creem’s hosted checkout and unlocks the creative-tool work plan. Access is saved to your account, with no subscription or automatic renewal.",
+    "boundary": "Work plans are curated by Loom for reading and planning, without automated execution. Loom Pro is available for USD 1.00 as a one-time purchase through Creem’s hosted checkout."
+  }
 }

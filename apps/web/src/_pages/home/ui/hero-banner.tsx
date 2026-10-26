@@ -10,7 +10,7 @@ export function HeroBanner() {
   return (
     <section
       data-loom-hero
-      className="loom-hero relative isolate -mx-6 overflow-hidden border-b px-6 py-16 sm:py-20 lg:-mx-10 lg:px-10"
+      className="relative isolate -mx-6 overflow-hidden px-6 py-16 sm:py-20 lg:-mx-10 lg:px-10"
     >
       <IntelligenceWeave />
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">

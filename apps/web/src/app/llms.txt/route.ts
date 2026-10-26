@@ -1,7 +1,10 @@
-import { llmsIndex, publicTextHeaders } from "@/shared/config/seo";
+import { createLlmsIndex, publicTextHeaders } from "@/shared/config/seo";
+import { getBillingPresentationMode } from "@/server/billing-presentation";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
-export function GET() {
-  return new Response(llmsIndex, { headers: { ...publicTextHeaders, "Content-Language": "en" } });
+export async function GET() {
+  return new Response(createLlmsIndex("en", await getBillingPresentationMode()), {
+    headers: { ...publicTextHeaders, "Content-Language": "en" },
+  });
 }

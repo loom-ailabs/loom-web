@@ -36,6 +36,23 @@ afterEach(() => {
 });
 
 describe("product entitlement lifecycle", () => {
+  it.each(["invalid_billing_mode", "billing_mode_mismatch"])(
+    "shows a safe configuration message for %s",
+    async (type) => {
+      vi.stubGlobal(
+        "fetch",
+        vi
+          .fn()
+          .mockResolvedValue(
+            response(503, { code: 1099, msg: "raw provider failure", error: { type } }),
+          ),
+      );
+      const { result } = renderHook(() => useProductAccess(), { wrapper: AccessWrapper });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.error).toBe("付款配置暂不可用，请稍后再试。");
+      expect(result.current.unlocked).toBe(false);
+    },
+  );
   it("keeps the loaded account when a route consumer is replaced", async () => {
     const fetchMock = vi.fn().mockResolvedValue(profile(false));
     vi.stubGlobal("fetch", fetchMock);

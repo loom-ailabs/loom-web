@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hotkey-tools-identity",
+  "name": "loom-identity",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-22",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -13,11 +13,15 @@
     "APP_URL": "https://checkout.loom-labs.ai",
     "LOGIN_URL": "https://login.loom-labs.ai",
     "AUTH_SUCCESS_URL": "https://www.loom-labs.ai/",
-    "LOGTO_ENDPOINT": "https://auth.loom-labs.ai",
-    "LOGTO_USER_NAMESPACE": "https://kpy72v.logto.app",
+    "LOGTO_ENDPOINT": "https://5z8hdi.logto.app",
+    "LOGTO_USER_NAMESPACE": "https://5z8hdi.logto.app",
     "LOGTO_COOKIE_DOMAIN": ".loom-labs.ai",
-    "LOGTO_APP_ID": "7wqbzelu2ey5n5brfr73d",
+    "LOGTO_APP_ID": "qc6kvqsqa3k4ti63rmom7",
+    "STRIPE_MODE": "test",
     "STRIPE_PRICE_ID": "price_1UTNA2K268Z7hNOawKnuuMQL",
+    "CREEM_MODE": "test",
+    "CREEM_PRODUCT_ID": "prod_6ntBKFLfAklD4ipCBu5exj",
+    "CREEM_PRO_PRODUCT_ID": "prod_7axKhvtA10UxHeQlhFi91U",
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -26,8 +30,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "hotkey-tools-identity",
-      "database_id": "a31cb3b2-dee4-4555-b7e4-b74304a28441",
+      "database_name": "loom-identity-production",
+      "database_id": "c6f250d7-ee2d-4436-a5dd-f4f4fe498546",
       "migrations_dir": "migrations",
     },
   ],
@@ -43,7 +47,11 @@
         "LOGTO_ENDPOINT": "https://auth.loom-labs.ai",
         "LOGTO_USER_NAMESPACE": "https://kpy72v.logto.app",
         "LOGTO_APP_ID": "7wqbzelu2ey5n5brfr73d",
+        "STRIPE_MODE": "test",
         "STRIPE_PRICE_ID": "price_1UTNA2K268Z7hNOawKnuuMQL",
+        "CREEM_MODE": "test",
+        "CREEM_PRODUCT_ID": "prod_6ntBKFLfAklD4ipCBu5exj",
+        "CREEM_PRO_PRODUCT_ID": "prod_7axKhvtA10UxHeQlhFi91U",
       },
       "d1_databases": [
         {

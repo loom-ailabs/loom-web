@@ -88,6 +88,7 @@ describe("D1 billing state", () => {
     );
     // Another valid purchase by the same user remains effective.
     const second = seedOrder(db, "other-order");
+    db.raw.prepare("UPDATE orders SET status='paid' WHERE id=?").run(second.id);
     db.raw
       .prepare(
         "INSERT INTO entitlements(order_id,user_id,product_key,feature_key,granted_at) VALUES (?, 'alice','hotkey-tools','premium-demo',1)",
@@ -195,6 +196,6 @@ describe("D1 billing state", () => {
     event.livemode = true;
     await expect(
       new BillingService(db.binding(), stripe, config).handleEvent(event),
-    ).rejects.toMatchObject({ status: 400, code: "sandbox_required" });
+    ).rejects.toMatchObject({ status: 400, code: "billing_mode_mismatch" });
   });
 });

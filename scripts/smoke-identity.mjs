@@ -34,4 +34,4 @@ assert.notEqual(crossSiteBody.code, 0);
 console.log(
   "Identity smoke passed: Next.js page + D1 + private API + rejected cross-site checkout.",
 );
-console.log("Logto sign-in and Stripe Sandbox payment still require real provider configuration.");
+console.log("Real Logto sign-in and Creem Test payment need separate end-to-end verification.");

@@ -1,7 +1,27 @@
 export { getLocale, getTranslations, getMessages, setRequestLocale } from "next-intl/server";
 import type { Locale } from "./routing";
 
-export async function getMessagesForLocale(locale: Locale) {
+/** Legal text stays in server-rendered pages rather than every client message payload. */
+export async function getLegalMessages(locale: Locale) {
+  return locale === "en"
+    ? (await import("../messages/en/legal.json")).default
+    : (await import("../messages/zh/legal.json")).default;
+}
+
+/** The Creem test purchase page loads its copy without changing other payment pages. */
+export async function getHeadshotMessages(locale: Locale) {
+  return locale === "en"
+    ? (await import("../messages/en/headshots.json")).default
+    : (await import("../messages/zh/headshots.json")).default;
+}
+
+function selectBilling<
+  T extends { billing: { test: Record<string, string>; live: Record<string, string> } },
+>(messages: T, mode: "test" | "live") {
+  return { ...messages, billing: { [mode]: messages.billing[mode] } };
+}
+
+export async function getMessagesForLocale(locale: Locale, billingMode: "test" | "live" = "test") {
   if (locale === "en") {
     const [Common, Web, SignIn, Access] = await Promise.all([
       import("../messages/en/common.json"),
@@ -11,9 +31,9 @@ export async function getMessagesForLocale(locale: Locale) {
     ]);
     return {
       Common: Common.default,
-      Web: Web.default,
+      Web: selectBilling(Web.default, billingMode),
       SignIn: SignIn.default,
-      Access: Access.default,
+      Access: selectBilling(Access.default, billingMode),
     };
   }
   const [Common, Web, SignIn, Access] = await Promise.all([
@@ -24,8 +44,8 @@ export async function getMessagesForLocale(locale: Locale) {
   ]);
   return {
     Common: Common.default,
-    Web: Web.default,
+    Web: selectBilling(Web.default, billingMode),
     SignIn: SignIn.default,
-    Access: Access.default,
+    Access: selectBilling(Access.default, billingMode),
   };
 }

@@ -41,6 +41,20 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe("manage account access", () => {
+  it.each([
+    ["en", "invalid_billing_mode"],
+    ["zh", "invalid_billing_mode"],
+    ["en", "billing_mode_mismatch"],
+    ["zh", "billing_mode_mismatch"],
+  ] as const)("maps %s %s to a safe localized configuration failure", async (locale, type) => {
+    api.fetchProfile.mockRejectedValue(
+      new ApiRequestError("raw provider configuration", 503, 1099, type),
+    );
+    const { result } = renderAccess(locale);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.configurationMissing).toBe(true);
+    expect(result.current.failure?.message).toBe(messages[locale].errors.configuration);
+  });
   it.each(["zh", "en"] as const)(
     "retries payment confirmation in %s without dropping the page locale",
     async (locale) => {
@@ -83,8 +97,41 @@ describe("manage account access", () => {
     expect(api.createCheckout).toHaveBeenCalledTimes(2);
     expect(api.createCheckout.mock.calls[0]?.[0]).toBeTruthy();
     expect(api.createCheckout.mock.calls[1]?.[0]).toBe(api.createCheckout.mock.calls[0]?.[0]);
+    expect(api.createCheckout.mock.calls[0]?.[1]).toBe("zh");
     expect(result.current.failure?.message).toBe(zh.errors.purchase);
     expect(result.current.action).toBeNull();
+  });
+
+  it.each(["en", "zh"] as const)(
+    "keeps the %s account route across sign-in and Creem checkout creation",
+    async (locale) => {
+      api.createCheckout.mockRejectedValue(new Error("temporarily unavailable"));
+      const { result } = renderAccess(locale);
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      const login = new URL(result.current.loginUrl, window.location.origin);
+      const returnTo = new URL(login.searchParams.get("returnTo")!);
+      expect(returnTo.origin).toBe(window.location.origin);
+      expect(returnTo.pathname).toBe(locale === "zh" ? "/zh" : "/");
+      await act(async () => {
+        await result.current.purchase();
+      });
+      expect(api.createCheckout.mock.calls[0]?.[1]).toBe(locale);
+    },
+  );
+
+  it("uses the local purchase_id ahead of Creem's provider order_id", async () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/?checkout=success&purchase_id=local-order&order_id=provider-order",
+    );
+    api.fetchOrder.mockResolvedValue({ status: "paid" });
+    api.fetchProfile.mockResolvedValue({ ...profile, entitlements: { premium: true } });
+    const { result } = renderAccess("en");
+    await waitFor(() => expect(result.current.notice).toBe(en.notices.paid));
+    expect(api.fetchOrder).toHaveBeenCalledWith("local-order", expect.any(AbortSignal));
+    expect(result.current.premium).toBe(true);
+    expect(window.location.search).toBe("");
   });
 
   it.each(["zh", "en"] as const)(

@@ -1,6 +1,7 @@
 "use client";
 
 import { localizeUrl } from "@hotkey-tools/i18n/routing";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 
 import { useLocale, useTranslations } from "@hotkey-tools/i18n";
 import { Button, GlassSurface, cn } from "@hotkey-tools/ui";
@@ -18,7 +19,13 @@ import {
 import type { useProductAccess } from "../model/use-product-access";
 
 type Access = ReturnType<typeof useProductAccess>;
-export function ProductWorkspace({ access }: { access: Access }) {
+export function ProductWorkspace({
+  access,
+  billingMode,
+}: {
+  access: Access;
+  billingMode: PaymentMode;
+}) {
   const t = useTranslations("Web");
   const locale = useLocale();
   const premium = access.profile?.entitlements.premium ?? false;
@@ -135,6 +142,11 @@ export function ProductWorkspace({ access }: { access: Access }) {
             {access.error && (
               <p role="alert" className="mt-4 text-sm text-destructive">
                 {access.error}
+              </p>
+            )}
+            {!premium && (
+              <p className="mt-4 text-xs leading-6 text-muted-foreground">
+                {t(`billing.${billingMode}.notice`)}
               </p>
             )}
             {access.unlocked && (

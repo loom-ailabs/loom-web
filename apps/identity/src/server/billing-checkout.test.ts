@@ -31,7 +31,7 @@ describe("Checkout intents and recovery", () => {
   afterEach(() => db.raw.close());
 
   it.each([
-    ["live", { livemode: true }],
+    ["wrong Price", { id: "price_other" }],
     ["inactive", { active: false }],
     ["subscription", { type: "recurring" }],
     ["tiered", { billing_scheme: "tiered" }],
@@ -137,7 +137,9 @@ describe("Checkout intents and recovery", () => {
           { id: "bob" },
           requestId,
         ),
-      ).rejects.toMatchObject({ code: "payment_mismatch" });
+      ).rejects.toMatchObject({
+        code: kind === "live" ? "billing_mode_mismatch" : "payment_mismatch",
+      });
       expect(
         db.raw.prepare("SELECT checkout_session_id FROM orders WHERE user_id='bob'").get()
           ?.checkout_session_id,
@@ -151,6 +153,10 @@ describe("Checkout intents and recovery", () => {
       user_id: "alice",
       product_key: "hotkey-tools",
       feature_key: "premium-demo",
+      stripe_mode: "test",
+      checkout_payload_version: 2,
+      amount: 1200,
+      currency: "usd",
     } as OrderRow);
     const keys: (string | undefined)[] = [];
     fixture.api.checkout.sessions.create.mockImplementation(async (params, ...rest: unknown[]) => {

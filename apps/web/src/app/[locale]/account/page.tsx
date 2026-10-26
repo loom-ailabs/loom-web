@@ -1,3 +1,4 @@
+import { getBillingPresentationMode } from "@/server/billing-presentation";
 import type { Metadata } from "next";
 import { getLocale } from "@hotkey-tools/i18n/server";
 import { HomePage } from "@/_pages/home";
@@ -8,6 +9,6 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: null, languages: {} },
   };
 }
-export default function Page() {
-  return <HomePage view="account" />;
+export default async function Page() {
+  return <HomePage view="account" billingMode={await getBillingPresentationMode()} />;
 }

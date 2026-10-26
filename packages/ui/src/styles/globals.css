@@ -219,8 +219,10 @@
 }
 
 /* The hero keeps its readable center while the digital threads occupy the edges. */
-.loom-hero {
+.loom-weave-field {
   background: radial-gradient(ellipse at 50% 80%, var(--ambient-primary), transparent 64%);
+  /* Fade only the decoration into the page, keeping text and controls opaque. */
+  mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
 }
 .loom-weave-canvas,
 .loom-weave-fallback {
@@ -246,7 +248,7 @@
   -webkit-text-fill-color: transparent;
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  .loom-hero {
+  .loom-weave-field {
     background: none;
   }
   .loom-weave-canvas,
@@ -255,6 +257,7 @@
   }
 }
 @media (forced-colors: active) {
+  .loom-weave-field,
   .loom-weave-canvas,
   .loom-weave-fallback {
     display: none;

@@ -24,7 +24,6 @@
   "pricingTitle": "Choose your starting point.",
   "pricingAccent": "Give your ideas room to grow.",
   "pricingBody": "From free exploration to an actionable work plan, find a starting point that fits your way of working.",
-  "sandboxNotice": "Test payments only. You will not be charged real money.",
   "exploreBody": "Get to know your next companion.",
   "free": "Free",
   "exploreBenefit1": "Explore the vision and workspace",
@@ -32,7 +31,6 @@
   "exploreBenefit3": "Imagine connections between familiar tools",
   "startExploring": "Start exploring",
   "proBody": "Give your creative idea a clear path forward.",
-  "testPayment": "USD · one-time test payment",
   "proBenefit1": "Unlock the creative-tool work plan",
   "proBenefit2": "Keep access across Loom products with one account",
   "proBenefit3": "One-time purchase, no subscription or renewal",
@@ -102,5 +100,17 @@
   "errorAuth": "Please log in to continue.",
   "errorPremium": "Unlock Loom Pro to view the work plan.",
   "errorBusy": "Your account is syncing. Please try again shortly.",
-  "paymentMode": "Test payment"
+  "billing": {
+    "test": {
+      "notice": "Test payments only. Creem Test mode does not charge real money.",
+      "label": "USD · one-time test payment",
+      "mode": "Creem Test mode"
+    },
+    "live": {
+      "notice": "One-time USD 1.00 purchase. Secure checkout hosted by Creem, with no subscription or automatic renewal.",
+      "label": "USD · one-time purchase",
+      "mode": "One-time purchase"
+    }
+  },
+  "errorConfiguration": "Payment setup is temporarily unavailable. Please try again later."
 }

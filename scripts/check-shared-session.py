@@ -157,7 +157,7 @@ def main():
                 "d1",
                 "migrations",
                 "apply",
-                "hotkey-tools-identity",
+                "DB",
                 "--local",
                 "--env",
                 "preview",

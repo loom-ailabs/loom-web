@@ -1,9 +1,10 @@
 import { isLocale } from "@hotkey-tools/i18n/routing";
+import { getBillingPresentationMode } from "@/server/billing-presentation";
 import { createLlmsFullText, publicTextHeaders, SITE_URL } from "@/shared/config/seo";
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) return new Response("Not found", { status: 404 });
-  return new Response(createLlmsFullText(locale), {
+  return new Response(createLlmsFullText(locale, await getBillingPresentationMode()), {
     headers: {
       ...publicTextHeaders,
       "Content-Language": locale === "en" ? "en" : "zh-CN",
@@ -11,3 +12,4 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
     },
   });
 }
+export const dynamic = "force-dynamic";

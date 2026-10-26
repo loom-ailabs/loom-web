@@ -1,18 +1,18 @@
 # 搜索与 AI 阅读入口
 
-本轮为 Loom AI 的四个公开页面提供可抓取的 HTML、独立元数据和机器阅读入口。当前工作区展示预置计划；USD 1.00 是一次性 Stripe Sandbox 测试金额，不是正式商业售价。代码配置、已发布站点、搜索引擎抓取、索引和排名分别验证。
+Loom AI 的六个公开页面提供中英文共十二个可抓取 URL、独立元数据和机器阅读入口。当前工作区提供人工整理的静态计划。已准备的代码按服务端 `STRIPE_MODE` 选择支付说明，test 明确不真实扣款，live 使用 USD 1.00 单次购买文案；用户本次决定继续 Sandbox，Live 关闭，不能将价格代码准备写成已可收取正式款项。身份与支付切换进度见[统一记录](production-cutover.md)。代码配置、已发布站点、搜索引擎抓取、索引和排名分别验证。
 
 ## 已实现的入口
 
-| 入口                                     | 当前行为                                                                                                                                                    |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`、`/vision`、`/workspace`、`/pricing` | 真实路径，正文由 Next.js 首次渲染；各自具有中文标题、描述、生产域 canonical 和 `zh-CN` 语言标记。公开介绍可匿名阅读，工作区的实际权益仍由私有 API 校验。    |
-| 分享元数据                               | 每页 Open Graph 和 Twitter Card 使用同页绝对地址、中文文案及原有 1254×1254 `/loom.png`，不重绘 Logo。                                                       |
-| JSON-LD                                  | `Organization` 与 `WebSite` 只包含实际品牌、站点、语言及 Logo；输出前转义 `<`。没有虚构评分、评论、地址、商业 Offer 或真实模型能力。                        |
-| `/robots.txt`                            | 允许公共内容抓取，并指向本站 sitemap。私有 API 通过认证、`private, no-store` 及 `X-Robots-Tag: noindex, nofollow, noarchive` 控制，不依靠 robots 隐藏信息。 |
-| `/sitemap.xml`                           | 只列四个公开 canonical URL；不列登录回调、用户、订单或支付接口。没有可靠内容更新时间时不生成虚假的 `lastmod`。                                              |
-| `/llms.txt`                              | Markdown 格式的站点说明、四个公开页面入口与纯文本正文链接，供主动支持该约定的 agent 使用。                                                                  |
-| `/llms-full.txt`                         | 四个页面的精简公开说明；只含产品方向、演示、测试付款和能力边界，不读取会话或数据库。                                                                        |
+| 入口                                                                             | 当前行为                                                                                                                                                    |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`、`/vision`、`/workspace`、`/pricing`、`/privacy`、`/terms` 及对应 `/zh` 路径 | 英文默认无前缀，中文使用 `/zh`，正文由 Next.js 首次渲染；输出对应语言的标题、描述、canonical 和 hreflang。公开介绍可匿名阅读，工作区权益仍由私有 API 校验。 |
+| 分享元数据                                                                       | 每页 Open Graph 和 Twitter Card 使用同页绝对地址、对应语言和模式文案及原有 1254×1254 `/loom.png`，不重绘 Logo。                                             |
+| JSON-LD                                                                          | `Organization` 与 `WebSite` 只包含实际品牌、站点、语言及 Logo；输出前转义 `<`。没有虚构评分、评论、地址、商业 Offer 或真实模型能力。                        |
+| `/robots.txt`                                                                    | 允许公共内容抓取，并指向本站 sitemap。私有 API 通过认证、`private, no-store` 及 `X-Robots-Tag: noindex, nofollow, noarchive` 控制，不依靠 robots 隐藏信息。 |
+| `/sitemap.xml`                                                                   | 列出六页两种语言的十二个公开 canonical URL；不列登录回调、用户、订单或支付接口。没有可靠内容更新时间时不生成虚假的 `lastmod`。                              |
+| `/llms.txt`                                                                      | Markdown 格式的站点说明、六个公开页面入口与纯文本正文链接，供主动支持该约定的 agent 使用。                                                                  |
+| `/llms-full.txt`                                                                 | 六个页面的精简公开说明；只含产品方向、工作计划、当前支付模式与能力边界，按请求读取公开模式配置，不读取会话或数据库。                                        |
 
 元数据与公开内容集中在 `apps/web/src/shared/config/seo.ts`。新增公开页面时同时维护 canonical、sitemap 和正文；产品能力变化时更新公开正文，避免 HTML 与纯文本描述分歧。Next.js 使用官方 [Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)、[robots](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots)、[sitemap](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap)和 [JSON-LD 输出方式](https://nextjs.org/docs/app/guides/json-ld)。
 
@@ -34,11 +34,11 @@ Cloudflare 可以在源站 robots 前[追加托管规则](https://developers.clo
 
 `Settings > Search generative AI` 已回读为继承父域 `loom-labs.ai` 的“包含”，保留原配置，未修改开关。[官方说明](https://support.google.com/webmasters/answer/16908024)指出默认选择 Include，有父属性时默认继承；本轮记录来自本站实际控制台，而非由默认规则推断。该开关不等于 AI 训练授权或排名保证。
 
-## 验证记录
+## 历史验证记录
 
 本地行为测试检查 sitemap 的公开范围、同页 canonical/分享地址、纯文本响应与敏感入口排除，以及 JSON-LD 注入边界。完整 Next.js/OpenNext 构建、Workers 预览和生产域 HTTP 检查由最终应用验证执行；搜索控制台结果和实际收录需另记，不能由单元测试推断。
 
-| 本轮已观察结果                          | 状态                                                                                                                                                                                                |
+| 历史已观察结果                          | 状态                                                                                                                                                                                                |
 | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | WWW Worker                              | `c7fbf7c8-c45a-45e5-b6d2-7ae7c15a0b85` 已部署，主站新版页面已生效。                                                                                                                                 |
 | 登录与购买 Worker                       | `a4224f5a-c2f1-427f-87c5-2fb94f03cce2` 已部署；本轮 GitHub 中央登录、三域共享身份、付款后演示与共享退出重登持权已真实通过；新订单成功全额退款后，D1 撤权及原已登录 WWW 会话的高级接口拒绝均已核对。 |
@@ -48,4 +48,4 @@ Cloudflare 可以在源站 robots 前[追加托管规则](https://developers.clo
 
 匿名检查前后 D1 均为用户 1、订单 4（pending 2、refunded 2）、权益 2（有效 0）、事件 8，查询 `rowsWritten=0`，数据库无变化；证据为 `shared-domain-negative-checks.json`。公开可达性另见 `seo-live-reachability.json`。实际搜索索引与真实 crawler IP 抓取仍未确认。GitHub 共享会话、付款后演示、共享退出重登及成功全额退款撤权已有独立浏览器、Stripe 和 D1 证据，不能由这组匿名请求推断。
 
-本轮成功全额退款为 `re_3UTQ2FK268Z7hNOa1gQwapex`，金额 USD 1.00，对应本次测试订单；原已登录 WWW 会话的高级接口返回 `code=2003`、`premium_required`，工作区恢复免费状态并隐藏旧计划。最终 D1 为用户 1、订单 5（refunded 3、pending 2）、权益 3（有效 0）、事件 12。本次付款完成及三类退款事件全部处理；记录为 `shared-domain-browser-e2e.json`、`shared-domain-billing.json` 与 `shared-domain-d1-refunded.json`。Google 仍按用户选择不关联同邮箱账号，不据此宣称其应用登录全链通过。
+该历史轮次成功全额退款为 `re_3UTQ2FK268Z7hNOa1gQwapex`，金额 USD 1.00，对应当时测试订单；原已登录 WWW 会话的高级接口返回 `code=2003`、`premium_required`，工作区恢复免费状态并隐藏旧计划。当时最终 D1 为用户 1、订单 5（refunded 3、pending 2）、权益 3（有效 0）、事件 12。付款完成及三类退款事件全部处理；记录为 `shared-domain-browser-e2e.json`、`shared-domain-billing.json` 与 `shared-domain-d1-refunded.json`。当时 Google 按用户选择停止关联；后续开发租户的真实登录记录另见应用 README，均不能替代本次生产租户验收。

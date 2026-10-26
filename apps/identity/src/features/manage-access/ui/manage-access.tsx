@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle, Badge, Button, cn } from "@hotkey-tools/ui";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 import { localizeUrl, useLocale, useTranslations } from "@hotkey-tools/i18n";
 import { Link } from "@hotkey-tools/i18n/navigation";
 import {
@@ -19,7 +20,7 @@ import {
 } from "lucide-react";
 import { useManageAccess } from "../model/use-manage-access";
 
-export function ManageAccess() {
+export function ManageAccess({ billingMode }: { billingMode: PaymentMode }) {
   const t = useTranslations("Access");
   const locale = useLocale();
   const benefits = [t("benefits.account"), t("benefits.confirmation"), t("benefits.persistence")];
@@ -124,7 +125,7 @@ export function ManageAccess() {
               </Button>
             ) : (
               <Button asChild className="h-9">
-                <a href="/api/auth/login?destination=checkout">
+                <a href={state.loginUrl}>
                   {t("signIn")}
                   <ArrowRight aria-hidden="true" />
                 </a>
@@ -193,7 +194,9 @@ export function ManageAccess() {
                 {!state.action && <ArrowRight aria-hidden="true" />}
               </Button>
             )}
-            <p className="text-xs leading-6 text-muted-foreground">{t("paymentDisclaimer")}</p>
+            <p className="text-xs leading-6 text-muted-foreground">
+              {t(`billing.${billingMode}.disclaimer`)}
+            </p>
           </div>
         </section>
       </div>

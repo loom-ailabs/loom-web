@@ -1,4 +1,4 @@
-import { isLocale } from "@hotkey-tools/i18n/routing";
+import { isLocale } from "@loom-ai/i18n/routing";
 import { getBillingPresentationMode } from "@/server/billing-presentation";
 import { createLlmsIndex, publicTextHeaders, SITE_URL } from "@/shared/config/seo";
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {

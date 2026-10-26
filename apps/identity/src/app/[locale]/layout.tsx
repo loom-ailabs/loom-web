@@ -1,14 +1,14 @@
 import { getBillingPresentationMode } from "@/server/billing-presentation";
 import { getEnv } from "@/server/env";
-import { SiteAnalytics } from "@hotkey-tools/analytics";
-import { getAnalyticsConfiguration } from "@hotkey-tools/analytics/server";
+import { SiteAnalytics } from "@loom-ai/analytics";
+import { getAnalyticsConfiguration } from "@loom-ai/analytics/server";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { AppearanceProvider } from "@hotkey-tools/ui";
-import { getMessagesForLocale } from "@hotkey-tools/i18n/server";
-import { isLocale, languageTag, localizeUrl } from "@hotkey-tools/i18n/routing";
+import { AppearanceProvider } from "@loom-ai/ui";
+import { getMessagesForLocale } from "@loom-ai/i18n/server";
+import { isLocale, languageTag, localizeUrl } from "@loom-ai/i18n/routing";
 import "../globals.css";
 
 export async function generateMetadata({

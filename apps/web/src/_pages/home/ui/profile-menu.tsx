@@ -1,10 +1,10 @@
 "use client";
 
-import { localizeUrl } from "@hotkey-tools/i18n/routing";
+import { localizeUrl } from "@loom-ai/i18n/routing";
 
 import { useRef } from "react";
-import { useTranslations } from "@hotkey-tools/i18n";
-import { Link, useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
+import { useTranslations } from "@loom-ai/i18n";
+import { Link, useLocaleSwitcher } from "@loom-ai/i18n/navigation";
 import {
   Avatar,
   AvatarFallback,
@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
   PreferencesMenu,
   PreferencesMenuItems,
-} from "@hotkey-tools/ui";
+} from "@loom-ai/ui";
 import { ArrowUpRight, LogOut, UserRound } from "lucide-react";
 import type { useProductAccess } from "@/features/product-workspace";
 

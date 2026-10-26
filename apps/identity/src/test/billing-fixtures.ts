@@ -3,7 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import Stripe from "stripe";
 import { vi } from "vitest";
 import type { OrderRow } from "../server/billing";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import type { StripeMode } from "@loom-ai/identity-core/billing-types";
 
 export const databaseBinding = { value: undefined as D1Database | undefined };
 export const environmentBinding = { value: {} as Record<string, string> };

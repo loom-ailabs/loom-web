@@ -1,12 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ComponentProps } from "react";
-import { NextIntlClientProvider } from "@hotkey-tools/i18n";
-import { getHeadshotMessages } from "@hotkey-tools/i18n/server";
+import { NextIntlClientProvider } from "@loom-ai/i18n";
+import { getHeadshotMessages } from "@loom-ai/i18n/server";
 import { describe, expect, it, vi } from "vitest";
 import { HeadshotsPage } from "./headshots-page";
 
 const preferences = vi.hoisted(() => ({ locale: "en" as "en" | "zh" }));
-vi.mock("@hotkey-tools/i18n/navigation", () => ({
+vi.mock("@loom-ai/i18n/navigation", () => ({
   Link: (props: ComponentProps<"a">) => <a {...props} />,
   useLocaleSwitcher: () => ({ locale: preferences.locale, switchLocale: vi.fn() }),
 }));

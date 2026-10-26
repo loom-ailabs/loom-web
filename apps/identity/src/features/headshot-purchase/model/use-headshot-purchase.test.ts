@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { NextIntlClientProvider } from "@hotkey-tools/i18n";
+import { NextIntlClientProvider } from "@loom-ai/i18n";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiRequestError } from "@/shared/api";
 import en from "../../../../../../packages/i18n/messages/en/headshots.json";

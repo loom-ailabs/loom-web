@@ -240,7 +240,7 @@ run = "pnpm --filter @hotkey-tools/web cf:build"
 [tasks."web:coverage"]
 description = "检查共享身份服务与 WWW API 覆盖率"
 run = [
-  "pnpm --filter @hotkey-tools/identity-core test:coverage",
+  "pnpm --filter @loom-ai/identity-core test:coverage",
   "pnpm --filter @hotkey-tools/web test:coverage",
 ]
 

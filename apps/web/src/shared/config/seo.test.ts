@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
-import { getSeoMessages } from "@hotkey-tools/i18n/seo";
+import type { PaymentMode } from "@loom-ai/identity-core/billing-types";
+import { getSeoMessages } from "@loom-ai/i18n/seo";
 const runtime = vi.hoisted(() => ({ mode: "test" as PaymentMode }));
 vi.mock("@/server/billing-presentation", () => ({
   getBillingPresentationMode: async () => runtime.mode,

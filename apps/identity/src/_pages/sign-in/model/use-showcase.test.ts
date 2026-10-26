@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, cleanup, renderHook } from "@testing-library/react";
-import type { CarouselApi } from "@hotkey-tools/ui";
+import type { CarouselApi } from "@loom-ai/ui";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useShowcase } from "./use-showcase";
 

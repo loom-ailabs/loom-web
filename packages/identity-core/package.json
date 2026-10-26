@@ -1,5 +1,5 @@
 {
-  "name": "@hotkey-tools/identity-core",
+  "name": "@loom-ai/identity-core",
   "version": "0.1.0",
   "private": true,
   "type": "module",

@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useTranslations } from "@hotkey-tools/i18n";
+import { useTranslations } from "@loom-ai/i18n";
 
 export type ProductProfile = {
   user: { id: string; name?: string; email?: string; picture?: string } | null;

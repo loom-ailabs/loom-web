@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getSeoMessages } from "@hotkey-tools/i18n/seo";
-import { languageTag, localizePath, type Locale } from "@hotkey-tools/i18n/routing";
-import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
+import { getSeoMessages } from "@loom-ai/i18n/seo";
+import { languageTag, localizePath, type Locale } from "@loom-ai/i18n/routing";
+import type { PaymentMode } from "@loom-ai/identity-core/billing-types";
 
 export const SITE_URL = "https://www.loom-labs.ai";
 export const SITE_NAME = "Loom AI";

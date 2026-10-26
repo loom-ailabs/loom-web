@@ -181,16 +181,16 @@ importers:
 
   apps/identity:
     dependencies:
-      '@hotkey-tools/analytics':
+      '@loom-ai/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
-      '@hotkey-tools/i18n':
+      '@loom-ai/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@hotkey-tools/identity-core':
+      '@loom-ai/identity-core':
         specifier: workspace:*
         version: link:../../packages/identity-core
-      '@hotkey-tools/ui':
+      '@loom-ai/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@opennextjs/cloudflare':
@@ -269,7 +269,7 @@ importers:
 
   apps/python:
     devDependencies:
-      '@hotkey-tools/python-core':
+      '@loom-ai/python-core':
         specifier: workspace:*
         version: link:../../packages/python/hotkey-core
       wrangler:
@@ -278,16 +278,16 @@ importers:
 
   apps/web:
     dependencies:
-      '@hotkey-tools/analytics':
+      '@loom-ai/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
-      '@hotkey-tools/i18n':
+      '@loom-ai/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@hotkey-tools/identity-core':
+      '@loom-ai/identity-core':
         specifier: workspace:*
         version: link:../../packages/identity-core
-      '@hotkey-tools/ui':
+      '@loom-ai/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@opennextjs/cloudflare':
@@ -385,7 +385,7 @@ importers:
 
   packages/analytics:
     dependencies:
-      '@hotkey-tools/ui':
+      '@loom-ai/ui':
         specifier: workspace:*
         version: link:../ui
       server-only:

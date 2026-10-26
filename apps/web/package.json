@@ -18,10 +18,10 @@
     "db:migrate:preview": "wrangler d1 migrations apply DB --local --env preview"
   },
   "dependencies": {
-    "@hotkey-tools/analytics": "workspace:*",
-    "@hotkey-tools/i18n": "workspace:*",
-    "@hotkey-tools/identity-core": "workspace:*",
-    "@hotkey-tools/ui": "workspace:*",
+    "@loom-ai/analytics": "workspace:*",
+    "@loom-ai/i18n": "workspace:*",
+    "@loom-ai/identity-core": "workspace:*",
+    "@loom-ai/ui": "workspace:*",
     "@opennextjs/cloudflare": "1.20.13",
     "jose": "5.10.0",
     "lucide-react": "^1.61.0",

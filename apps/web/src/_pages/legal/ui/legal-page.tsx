@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { getLegalMessages } from "@hotkey-tools/i18n/server";
-import { localizePath, type Locale } from "@hotkey-tools/i18n/routing";
+import { getLegalMessages } from "@loom-ai/i18n/server";
+import { localizePath, type Locale } from "@loom-ai/i18n/routing";
 import { LegalControls } from "./legal-controls";
 
 export async function LegalPage({ kind, locale }: { kind: "privacy" | "terms"; locale: Locale }) {

@@ -6,7 +6,7 @@ const { getDatabase, getEnv, hasPremiumInDatabase } = vi.hoisted(() => ({
 }));
 vi.mock("./db", () => ({ getDatabase }));
 vi.mock("./env", () => ({ getEnv }));
-vi.mock("@hotkey-tools/identity-core/entitlements", () => ({ hasPremiumInDatabase }));
+vi.mock("@loom-ai/identity-core/entitlements", () => ({ hasPremiumInDatabase }));
 import { hasPremium } from "./entitlements";
 beforeEach(() => {
   getEnv.mockReset();

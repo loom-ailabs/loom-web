@@ -1,4 +1,4 @@
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-mode";
+import type { StripeMode } from "@loom-ai/identity-core/billing-mode";
 
 export type CheckoutUser = { id: string; email?: string; name?: string };
 export type OrderStatus = "pending" | "paid" | "refunded" | "expired";

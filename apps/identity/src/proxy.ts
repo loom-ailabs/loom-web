@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { localeProxy } from "@hotkey-tools/i18n/proxy";
+import { localeProxy } from "@loom-ai/i18n/proxy";
 export default function proxy(request: NextRequest) {
   return localeProxy(request);
 }

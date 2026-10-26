@@ -4,7 +4,7 @@ import {
   PRODUCT_KEY,
   FEATURE_KEY,
   hasPremiumInDatabase,
-} from "@hotkey-tools/identity-core/entitlements";
+} from "@loom-ai/identity-core/entitlements";
 import { ApiError } from "./http";
 import type { BillingConfig, CheckoutUser, OrderRow } from "./billing-types";
 import {

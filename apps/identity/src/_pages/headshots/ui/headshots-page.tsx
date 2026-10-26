@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { localizeUrl, useTranslations } from "@hotkey-tools/i18n";
-import { Link, useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
-import { Alert, AlertDescription, Badge, PreferencesMenu } from "@hotkey-tools/ui";
+import { localizeUrl, useTranslations } from "@loom-ai/i18n";
+import { Link, useLocaleSwitcher } from "@loom-ai/i18n/navigation";
+import { Alert, AlertDescription, Badge, PreferencesMenu } from "@loom-ai/ui";
 import { FlaskConical, Info } from "lucide-react";
 import { HeadshotPurchase } from "@/features/headshot-purchase";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@hotkey-tools/analytics",
+  "name": "@loom-ai/analytics",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@hotkey-tools/ui": "workspace:*",
+    "@loom-ai/ui": "workspace:*",
     "server-only": "0.0.1"
   },
   "devDependencies": {

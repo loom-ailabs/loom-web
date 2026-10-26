@@ -1,14 +1,7 @@
 "use client";
 
-import { useTranslations } from "@hotkey-tools/i18n";
-import {
-  Button,
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  GlassSurface,
-  cn,
-} from "@hotkey-tools/ui";
+import { useTranslations } from "@loom-ai/i18n";
+import { Button, Carousel, CarouselContent, CarouselItem, GlassSurface, cn } from "@loom-ai/ui";
 import { Layers3, ShieldCheck, Sparkles } from "lucide-react";
 import { useShowcase } from "../model/use-showcase";
 import { LoginArt } from "./login-art";

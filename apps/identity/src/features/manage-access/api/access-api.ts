@@ -1,5 +1,5 @@
 import { readResponse } from "@/shared/api";
-import type { Locale } from "@hotkey-tools/i18n";
+import type { Locale } from "@loom-ai/i18n";
 import type { Checkout, Order, Profile } from "../model/types";
 
 export async function fetchProfile(signal?: AbortSignal) {

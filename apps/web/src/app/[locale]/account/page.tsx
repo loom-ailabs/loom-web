@@ -1,6 +1,6 @@
 import { getBillingPresentationMode } from "@/server/billing-presentation";
 import type { Metadata } from "next";
-import { getLocale } from "@hotkey-tools/i18n/server";
+import { getLocale } from "@loom-ai/i18n/server";
 import { HomePage } from "@/_pages/home";
 export async function generateMetadata(): Promise<Metadata> {
   return {

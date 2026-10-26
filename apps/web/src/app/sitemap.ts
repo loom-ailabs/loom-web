@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { locales } from "@hotkey-tools/i18n/routing";
+import { locales } from "@loom-ai/i18n/routing";
 import { PUBLIC_PAGES, publicPageUrl } from "@/shared/config/seo";
 export default function sitemap(): MetadataRoute.Sitemap {
   return PUBLIC_PAGES.flatMap((page) =>

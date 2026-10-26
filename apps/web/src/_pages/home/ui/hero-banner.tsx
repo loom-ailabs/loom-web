@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { useTranslations } from "@hotkey-tools/i18n";
-import { Link } from "@hotkey-tools/i18n/navigation";
-import { Button, GlassSurface } from "@hotkey-tools/ui";
+import { useTranslations } from "@loom-ai/i18n";
+import { Link } from "@loom-ai/i18n/navigation";
+import { Button, GlassSurface } from "@loom-ai/ui";
 import { ArrowRight, BookOpen, ListChecks, PencilLine, Sparkles } from "lucide-react";
 import { IntelligenceWeave } from "./intelligence-weave";
 

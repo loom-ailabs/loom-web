@@ -1,4 +1,4 @@
-import { getLocale } from "@hotkey-tools/i18n/server";
+import { getLocale } from "@loom-ai/i18n/server";
 import { LegalPage } from "@/_pages/legal";
 import { createPageMetadata } from "@/shared/config/seo";
 

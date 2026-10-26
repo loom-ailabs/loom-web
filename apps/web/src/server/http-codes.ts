@@ -1,1 +1,1 @@
-export * from "@hotkey-tools/identity-core/http-codes";
+export * from "@loom-ai/identity-core/http-codes";

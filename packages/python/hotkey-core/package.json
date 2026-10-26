@@ -1,5 +1,5 @@
 {
-  "name": "@hotkey-tools/python-core",
+  "name": "@loom-ai/python-core",
   "version": "0.1.0",
   "private": true,
   "scripts": {

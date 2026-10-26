@@ -1,1 +1,1 @@
-export type { ApiSuccess, ApiFailure, ApiResponse } from "@hotkey-tools/identity-core/contract";
+export type { ApiSuccess, ApiFailure, ApiResponse } from "@loom-ai/identity-core/contract";

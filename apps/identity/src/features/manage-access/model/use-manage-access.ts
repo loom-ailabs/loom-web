@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { localizePath, useLocale, useTranslations } from "@hotkey-tools/i18n";
+import { localizePath, useLocale, useTranslations } from "@loom-ai/i18n";
 import { ApiRequestError } from "@/shared/api";
 import { createCheckout, fetchOrder, fetchPremium, fetchProfile } from "../api/access-api";
 import type { Profile } from "./types";

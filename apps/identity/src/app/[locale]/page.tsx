@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
-import { resolveLoginReturnTarget } from "@hotkey-tools/identity-core/auth-routes";
+import { resolveLoginReturnTarget } from "@loom-ai/identity-core/auth-routes";
 import { IdentityPage } from "@/_pages/identity";
 import { SignInPage } from "@/_pages/sign-in";
 import { getAuthClient, getLoginPageConfig, getUser } from "@/server/auth";

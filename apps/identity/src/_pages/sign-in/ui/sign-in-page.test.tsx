@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { NextIntlClientProvider } from "@hotkey-tools/i18n";
+import { NextIntlClientProvider } from "@loom-ai/i18n";
 import { describe, expect, it, vi } from "vitest";
 import zh from "../../../../../../packages/i18n/messages/zh/sign-in.json";
 import en from "../../../../../../packages/i18n/messages/en/sign-in.json";
@@ -8,7 +8,7 @@ import enCommon from "../../../../../../packages/i18n/messages/en/common.json";
 import { SignInPage } from "./sign-in-page";
 
 const preference = vi.hoisted(() => ({ locale: "zh" as "zh" | "en" }));
-vi.mock("@hotkey-tools/i18n/navigation", () => ({
+vi.mock("@loom-ai/i18n/navigation", () => ({
   useLocaleSwitcher: () => ({ locale: preference.locale, switchLocale: vi.fn() }),
 }));
 

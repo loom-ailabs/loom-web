@@ -1,6 +1,6 @@
 import "server-only";
 import type Stripe from "stripe";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-mode";
+import type { StripeMode } from "@loom-ai/identity-core/billing-mode";
 import { ApiError } from "./http";
 import type { OrderRow } from "./billing-types";
 

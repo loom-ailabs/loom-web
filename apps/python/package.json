@@ -15,7 +15,7 @@
     "deploy:dry-run": "pnpm cloudflare:sync && uv run --locked --package hotkey-tools-python env UV_NO_EDITABLE=1 pywrangler deploy --dry-run"
   },
   "devDependencies": {
-    "@hotkey-tools/python-core": "workspace:*",
+    "@loom-ai/python-core": "workspace:*",
     "wrangler": "4.151.2"
   }
 }

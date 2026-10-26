@@ -11,10 +11,10 @@ initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   transpilePackages: [
-    "@hotkey-tools/ui",
-    "@hotkey-tools/identity-core",
-    "@hotkey-tools/i18n",
-    "@hotkey-tools/analytics",
+    "@loom-ai/ui",
+    "@loom-ai/identity-core",
+    "@loom-ai/i18n",
+    "@loom-ai/analytics",
   ],
   images: { unoptimized: true },
   webpack(config) {

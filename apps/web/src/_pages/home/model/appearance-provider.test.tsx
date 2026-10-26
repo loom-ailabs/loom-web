@@ -3,7 +3,7 @@ import { runInNewContext } from "node:vm";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { AppearanceProvider, type Appearance } from "@hotkey-tools/ui";
+import { AppearanceProvider, type Appearance } from "@loom-ai/ui";
 
 function serverMarkup(initialTheme?: Appearance) {
   const markup = renderToStaticMarkup(

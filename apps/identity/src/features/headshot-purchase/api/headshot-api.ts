@@ -1,4 +1,4 @@
-import type { Locale } from "@hotkey-tools/i18n";
+import type { Locale } from "@loom-ai/i18n";
 import { readResponse } from "@/shared/api";
 import type { HeadshotAccount, HeadshotCheckout, HeadshotOrder } from "../model/types";
 

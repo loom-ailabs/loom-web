@@ -1,13 +1,13 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AnchorHTMLAttributes } from "react";
-import { AppearanceProvider } from "@hotkey-tools/ui";
+import { AppearanceProvider } from "@loom-ai/ui";
 import { IntlWrapper } from "@/test/intl-wrapper";
 import { AccountMenu } from "./profile-menu";
 import type { useProductAccess } from "@/features/product-workspace";
 
 const switchLocale = vi.fn();
-vi.mock("@hotkey-tools/i18n/navigation", () => ({
+vi.mock("@loom-ai/i18n/navigation", () => ({
   Link: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props} />,
   useLocaleSwitcher: () => ({ locale: "zh", switchLocale }),
 }));

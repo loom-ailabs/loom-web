@@ -1,6 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
-import { parseStripeMode } from "@hotkey-tools/identity-core/billing-mode";
+import { parseStripeMode } from "@loom-ai/identity-core/billing-mode";
 import type { IdentityEnv } from "./env";
 import { ApiError } from "./http";
 import type { BillingConfig } from "./billing-types";

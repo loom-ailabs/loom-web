@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "@hotkey-tools/i18n";
-import { useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
-import { PreferencesMenu } from "@hotkey-tools/ui";
+import { useTranslations } from "@loom-ai/i18n";
+import { useLocaleSwitcher } from "@loom-ai/i18n/navigation";
+import { PreferencesMenu } from "@loom-ai/ui";
 
 export function LegalControls() {
   const t = useTranslations("Common");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@hotkey-tools/ui";
+import { Button } from "@loom-ai/ui";
 import type { AnalyticsCopy } from "./contract";
 import type { Consent } from "./browser";
 

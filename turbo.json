@@ -12,7 +12,7 @@
     "@hotkey-tools/python#build": {
       "outputs": ["dist/**"]
     },
-    "@hotkey-tools/python-core#build": {
+    "@loom-ai/python-core#build": {
       "outputs": ["dist/**"]
     },
     "@hotkey-tools/worker#build": {

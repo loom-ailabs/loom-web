@@ -1,5 +1,5 @@
-import { useLocale, useTranslations } from "@hotkey-tools/i18n";
-import { getSeoMessages } from "@hotkey-tools/i18n/seo";
+import { useLocale, useTranslations } from "@loom-ai/i18n";
+import { getSeoMessages } from "@loom-ai/i18n/seo";
 
 export function PlatformIntroduction() {
   const t = useTranslations("Web");

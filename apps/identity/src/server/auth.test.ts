@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/server/env", () => ({ getEnv: mocks.getEnv }));
 vi.mock("@/server/db", () => ({ getDatabase: mocks.getDatabase }));
 vi.mock("@/server/billing", () => ({ hasPremium: mocks.hasPremium }));
-vi.mock("@hotkey-tools/identity-core/session", () => ({
+vi.mock("@loom-ai/identity-core/session", () => ({
   default: class {
     handleSignIn = mocks.signIn;
     handleSignInCallback = mocks.callback;

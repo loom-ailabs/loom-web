@@ -1,12 +1,12 @@
 "use client";
 
-import { localizeUrl } from "@hotkey-tools/i18n/routing";
-import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
+import { localizeUrl } from "@loom-ai/i18n/routing";
+import type { PaymentMode } from "@loom-ai/identity-core/billing-types";
 
 import Image from "next/image";
-import { Button, GlassSurface } from "@hotkey-tools/ui";
-import { useLocale, useTranslations } from "@hotkey-tools/i18n";
-import { Link } from "@hotkey-tools/i18n/navigation";
+import { Button, GlassSurface } from "@loom-ai/ui";
+import { useLocale, useTranslations } from "@loom-ai/i18n";
+import { Link } from "@loom-ai/i18n/navigation";
 import {
   ArrowRight,
   ArrowUpRight,

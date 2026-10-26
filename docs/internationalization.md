@@ -39,14 +39,14 @@ Next.js 官方推荐以动态语言段承载子路径语言路由；next-intl �
 客户端翻译：
 
 ```tsx
-import { useTranslations } from "@hotkey-tools/i18n";
-import { Link, useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
+import { useTranslations } from "@loom-ai/i18n";
+import { Link, useLocaleSwitcher } from "@loom-ai/i18n/navigation";
 
 const t = useTranslations("Web");
 const { locale, switchLocale } = useLocaleSwitcher();
 ```
 
-服务端翻译使用 `@hotkey-tools/i18n/server` 的 `getTranslations`。消息按 namespace 分文件，中文和英文必须具有一致的键；共享测试负责检查两份目录对应关系。导航和纯翻译使用不同出口，避免测试只使用翻译时无必要地加载 Next 导航实现。
+服务端翻译使用 `@loom-ai/i18n/server` 的 `getTranslations`。消息按 namespace 分文件，中文和英文必须具有一致的键；共享测试负责检查两份目录对应关系。导航和纯翻译使用不同出口，避免测试只使用翻译时无必要地加载 Next 导航实现。
 
 ## 认证语言
 

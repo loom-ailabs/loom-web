@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ComponentProps } from "react";
-import { NextIntlClientProvider } from "@hotkey-tools/i18n";
-import { getMessagesForLocale } from "@hotkey-tools/i18n/server";
-import { getSeoMessages } from "@hotkey-tools/i18n/seo";
+import { NextIntlClientProvider } from "@loom-ai/i18n";
+import { getMessagesForLocale } from "@loom-ai/i18n/server";
+import { getSeoMessages } from "@loom-ai/i18n/seo";
 import { describe, expect, it, vi } from "vitest";
 import { HomePage } from "./home-page";
 
 const preference = vi.hoisted(() => ({ locale: "en" as "en" | "zh" }));
-vi.mock("@hotkey-tools/i18n/navigation", () => ({
+vi.mock("@loom-ai/i18n/navigation", () => ({
   Link: (props: ComponentProps<"a">) => <a {...props} />,
   useLocaleSwitcher: () => ({ locale: preference.locale, switchLocale: vi.fn() }),
 }));

@@ -27,7 +27,7 @@ The professional headshot package is a separate Creem Test product: a USD 9.99 o
 
 Each new product uses a separate full-stack Next.js application under `apps/<product_name>`. Shared authentication, HTTP handling, and entitlement queries live in `packages/identity-core`; payment SDKs and webhooks live only in `apps/identity`. The legacy `apps/worker` has its own static placeholder page and example APIs. Python is used as a separate service only when a capability actually requires it.
 
-Renaming the repository does not change existing package names or runtime identifiers. References to `@hotkey-tools/*`, `hotkey-tools-core`, database names, and order identifiers still match the actual configuration; historical deployment records retain the resource names used at the time.
+Shared workspace packages under `packages/` use the `@loom-ai/*` scope. Application packages under `apps/` use `@hotkey-tools/*`. The Python distribution `hotkey-tools-core`, database names, and order identifiers keep their configured names; historical deployment records retain the resource names used at the time.
 
 ## Setup and daily development
 

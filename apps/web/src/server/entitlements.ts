@@ -1,6 +1,6 @@
 import "server-only";
-import { hasPremiumInDatabase } from "@hotkey-tools/identity-core/entitlements";
-import { parseCreemMode } from "@hotkey-tools/identity-core/billing-mode";
+import { hasPremiumInDatabase } from "@loom-ai/identity-core/entitlements";
+import { parseCreemMode } from "@loom-ai/identity-core/billing-mode";
 import { getDatabase } from "./db";
 import { getEnv } from "./env";
 export async function hasPremium(userId: string): Promise<boolean> {

@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { NextIntlClientProvider } from "@hotkey-tools/i18n";
-import { getLegalMessages, getMessagesForLocale } from "@hotkey-tools/i18n/server";
+import { NextIntlClientProvider } from "@loom-ai/i18n";
+import { getLegalMessages, getMessagesForLocale } from "@loom-ai/i18n/server";
 import { describe, expect, it, vi } from "vitest";
 import { LegalPage } from "./legal-page";
 
 const preference = vi.hoisted(() => ({ locale: "en" as "en" | "zh" }));
-vi.mock("@hotkey-tools/i18n/navigation", () => ({
+vi.mock("@loom-ai/i18n/navigation", () => ({
   useLocaleSwitcher: () => ({ locale: preference.locale, switchLocale: vi.fn() }),
 }));
 

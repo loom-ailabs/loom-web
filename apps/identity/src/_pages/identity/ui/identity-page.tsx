@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
-import { localizeUrl, useTranslations } from "@hotkey-tools/i18n";
-import { Link, useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
-import { Badge, PreferencesMenu } from "@hotkey-tools/ui";
+import type { PaymentMode } from "@loom-ai/identity-core/billing-types";
+import { localizeUrl, useTranslations } from "@loom-ai/i18n";
+import { Link, useLocaleSwitcher } from "@loom-ai/i18n/navigation";
+import { Badge, PreferencesMenu } from "@loom-ai/ui";
 import { ArrowUpRight, CreditCard, FlaskConical, ShieldCheck } from "lucide-react";
 import { ManageAccess } from "@/features/manage-access";
 

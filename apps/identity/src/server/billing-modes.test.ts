@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
-import { hasPremiumInDatabase } from "@hotkey-tools/identity-core/entitlements";
+import type { StripeMode } from "@loom-ai/identity-core/billing-types";
+import { hasPremiumInDatabase } from "@loom-ai/identity-core/entitlements";
 import {
   SQLiteD1,
   databaseBinding,

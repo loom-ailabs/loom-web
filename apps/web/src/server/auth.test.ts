@@ -3,7 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ getEnv: vi.fn(), getDatabase: vi.fn(), getContext: vi.fn() }));
 vi.mock("./env", () => ({ getEnv: mocks.getEnv }));
 vi.mock("./db", () => ({ getDatabase: mocks.getDatabase }));
-vi.mock("@hotkey-tools/identity-core/session", () => ({
+vi.mock("@loom-ai/identity-core/session", () => ({
   default: class {},
   getLogtoContext: mocks.getContext,
 }));

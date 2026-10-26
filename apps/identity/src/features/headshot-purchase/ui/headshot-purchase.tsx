@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useTranslations } from "@hotkey-tools/i18n";
+import { useFormatter, useTranslations } from "@loom-ai/i18n";
 import {
   Alert,
   AlertDescription,
@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
   cn,
-} from "@hotkey-tools/ui";
+} from "@loom-ai/ui";
 import {
   ArrowRight,
   Check,

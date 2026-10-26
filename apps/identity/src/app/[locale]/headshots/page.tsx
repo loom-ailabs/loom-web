@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { isLocale } from "@hotkey-tools/i18n/routing";
-import { getHeadshotMessages } from "@hotkey-tools/i18n/server";
+import { isLocale } from "@loom-ai/i18n/routing";
+import { getHeadshotMessages } from "@loom-ai/i18n/server";
 import { HeadshotsPage } from "@/_pages/headshots";
 
 export async function generateMetadata({

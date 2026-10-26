@@ -1,9 +1,9 @@
 "use client";
 
-import { Alert, AlertDescription, AlertTitle, Badge, Button, cn } from "@hotkey-tools/ui";
-import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
-import { localizeUrl, useLocale, useTranslations } from "@hotkey-tools/i18n";
-import { Link } from "@hotkey-tools/i18n/navigation";
+import { Alert, AlertDescription, AlertTitle, Badge, Button, cn } from "@loom-ai/ui";
+import type { PaymentMode } from "@loom-ai/identity-core/billing-types";
+import { localizeUrl, useLocale, useTranslations } from "@loom-ai/i18n";
+import { Link } from "@loom-ai/i18n/navigation";
 import {
   ArrowRight,
   Check,

@@ -20,7 +20,7 @@ WWW 与账户/购买应用共用的服务端实现；不包含 Cloudflare bindin
 生产固定 `LOGTO_USER_NAMESPACE=https://kpy72v.logto.app`；它不是 OIDC issuer 的替代品，SDK 仍从当前 endpoint 发现并校验实际 issuer。本地统一 localhost，两端口使用同一密钥，Cookie 不设置 Domain；不能用端口隔离同名 Cookie。
 
 ```bash
-mise exec -- pnpm --filter @hotkey-tools/identity-core test:coverage
+mise exec -- pnpm --filter @loom-ai/identity-core test:coverage
 ```
 
 核心四项覆盖率门槛均为 90%；会话与权益使用真实 SQLite 查询，SDK 协议测试使用合成供应商响应，支付事务与实际迁移测试归 `apps/identity`。重点覆盖绝对到期、轮换、并发刷新、失败关闭、退出竞争和迟到回调；这些测试不等于真实供应商在线刷新证据。

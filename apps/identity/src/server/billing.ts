@@ -1,7 +1,7 @@
 import "server-only";
 import Stripe from "stripe";
-import { parseCreemMode, parseStripeMode } from "@hotkey-tools/identity-core/billing-mode";
-import { hasPremiumInDatabase } from "@hotkey-tools/identity-core/entitlements";
+import { parseCreemMode, parseStripeMode } from "@loom-ai/identity-core/billing-mode";
+import { hasPremiumInDatabase } from "@loom-ai/identity-core/entitlements";
 import { getDatabase } from "./db";
 import { getEnv } from "./env";
 import { ApiError } from "./http";
@@ -10,7 +10,7 @@ import { BillingService } from "./billing-service";
 import { requireCheckoutPayloadVersion } from "./billing-checkout-payload";
 import type { CheckoutUser, OrderRow } from "./billing-types";
 
-export { PRODUCT_KEY, FEATURE_KEY } from "@hotkey-tools/identity-core/entitlements";
+export { PRODUCT_KEY, FEATURE_KEY } from "@loom-ai/identity-core/entitlements";
 export { BillingService } from "./billing-service";
 export { createStripeClient, getBillingConfig } from "./billing-config";
 export type { OrderRow } from "./billing-types";

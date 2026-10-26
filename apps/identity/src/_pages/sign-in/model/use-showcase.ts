@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CarouselApi } from "@hotkey-tools/ui";
+import type { CarouselApi } from "@loom-ai/ui";
 
 export function useShowcase() {
   const [api, setApi] = useState<CarouselApi>();

@@ -1,99 +1,99 @@
-# Identity：账户与购买应用
+# Identity: Accounts and Purchases
 
-本应用将页面、登录回调、订单 API、支付 Webhook 和付费鉴权放在同一个 Next.js App Router 服务中，通过 OpenNext 部署到一个 Cloudflare Worker，提供 Loom 账号管理、Loom Pro 工作计划访问和独立职业照套餐。全站新购买统一 Creem Test mode；Stripe 只保留历史订单查询、退款和撤权。数据库历史标识继续沿用 `hotkey-tools` / `premium-demo`，不改既有订单或权益归属；不包含订阅、用量计费或独立身份签发服务。
+This application hosts pages, sign-in callbacks, order APIs, payment webhooks, and paid-access authorization in a single Next.js App Router service, deployed as one Cloudflare Worker through OpenNext. It provides Loom account management, access to Loom Pro work plans, and a separate professional headshot package. All new purchases across the site use Creem Test mode; Stripe is retained only for historical order queries, refunds, and entitlement revocation. Historical database identifiers remain `hotkey-tools` / `premium-demo`, preserving the ownership of existing orders and entitlements. Subscriptions, usage-based billing, and a standalone identity issuer are outside its scope.
 
-Logto 负责认证和短期令牌刷新，D1 保存可撤销会话、用户、订单和权益，Creem Test mode 负责新购买。付费权限由业务数据库判断，不依赖 Logto 的 RBAC 或自定义 API resources。开发租户可用功能不能代替生产 Free 套餐的验证。
+Logto handles authentication and short-lived token refresh. D1 stores revocable sessions, users, orders, and entitlements, while Creem Test mode handles new purchases. The application database determines paid access, without relying on Logto RBAC or custom API resources. Features available in a development tenant do not establish that they work on the production Free plan.
 
-线上使用 Logto 生产 Free 身份与独立 D1，新购买为 Creem Test mode，真实收款未开放。当前支付配置见 [Creem 接入说明](../../docs/creem-test-integration.md)；[生产切换说明](../../docs/production-cutover.md)保留原 Logto/Stripe 阶段的历史验收。
+The deployed application uses a Logto production Free tenant and a separate D1 database. New purchases use Creem Test mode; real payments are not enabled. See the [Creem integration guide](../../docs/creem-test-integration.md) for the current payment configuration. The [production cutover guide](../../docs/production-cutover.md) retains historical acceptance results from the original Logto/Stripe phase.
 
-Loom Pro 保留 USD 1.00 单次购买，使用独立 Creem 商品 `prod_7axKhvtA10UxHeQlhFi91U`，由根路径账号页的 `/api/checkout` 下单。当前有效 Pro 权益来自同用户已付款且未撤回的新 Creem Pro 订单或历史 Stripe Pro 订单；职业照套餐不授予 Pro。已有 Pro 的账号不会重复创建新 Pro 购买。
+Loom Pro remains a one-time USD 1.00 purchase, using the separate Creem product `prod_7axKhvtA10UxHeQlhFi91U`. The account page at the root path places orders through `/api/checkout`. Valid Pro entitlements come from the same user's paid, unrevoked Creem Pro orders or historical Stripe Pro orders; headshot packages do not grant Pro. Accounts that already have Pro do not create another Pro purchase.
 
-职业形象照包使用独立的 Creem Test 支付链路：`/headshots`、`/zh/headshots`；USD 9.99 含税、单次购买，每单 4 张成片权益及 1 次重做，允许多次购买。接口为 `GET /api/headshot_packs`、`POST /api/headshot_checkout`、`GET /api/headshot_orders/[order_id]` 与 `POST /api/webhooks/creem`。配置、数据隔离和本轮验收见 [Creem 测试支付接入](../../docs/creem-test-integration.md)。
+The professional headshot package has a separate Creem Test payment flow at `/headshots` and `/zh/headshots`: a one-time USD 9.99 purchase including tax, with entitlements to 4 finished photos and 1 redo per order. Repeat purchases are allowed. Its APIs are `GET /api/headshot_packs`, `POST /api/headshot_checkout`, `GET /api/headshot_orders/[order_id]`, and `POST /api/webhooks/creem`. See the [Creem Test payment integration](../../docs/creem-test-integration.md) for configuration, data isolation, and acceptance results for this phase.
 
-## 中英文与外观
+## Languages and Appearance
 
-登录与购买页面默认英文根路径，中文使用 `/zh`；旧 `/en` 页面保留原始 query 并规范跳转到英文根路径。登录操作区居中，右侧产品愿景轮播默认自动播放，可视控制只保留分页点，键盘聚焦可操作暂停/播放，并遵循减少动态效果设置。购买页使用账号、访问权限和一次性解锁等正式措辞，购买位置明确显示测试支付、不真实扣款；工作计划仍为主站人工整理的静态内容。
+Sign-in and purchase pages use English at the root paths by default and Chinese under `/zh`. Legacy `/en` pages preserve the original query string and redirect to the canonical English root paths. The sign-in controls are centered, and the product vision carousel on the right plays automatically by default. Pagination dots are its only persistently visible controls; pause/play is available on keyboard focus, and the carousel honors reduced-motion preferences. Purchase pages use standard product language such as accounts, access, and one-time unlocks. Purchase controls clearly state that payments are for testing and no real charge will occur. Work plans remain static content curated on the main site.
 
-界面使用共享浅色、深色、跟随系统与语言偏好；共享语言菜单按 English、简体中文排序，保留已保存的偏好。生产 `LOOM_LOCALE`、`LOOM_THEME` 只保存非敏感偏好，与 HttpOnly 随机会话标识分开；identity 所有语言页面仍禁止索引。
+The interface shares light, dark, system appearance, and language preferences. The shared language menu lists English first, followed by Simplified Chinese, while preserving the saved preference. In production, `LOOM_LOCALE` and `LOOM_THEME` store only non-sensitive preferences, separately from the HttpOnly random session identifier. All Identity pages remain excluded from indexing in every language.
 
-`/api/auth/login`、callback、订单、Creem Webhook 与历史 Stripe Webhook 均不带语言前缀。有效语言偏好只通过官方 SDK 的固定 `ui_locales=zh-CN|en` 影响托管登录界面，不改变身份验证或返回地址校验。消息和布局接线见[国际化说明](../../docs/internationalization.md)；主站头像菜单和个人信息页由 `apps/web` 承载。
+`/api/auth/login`, callbacks, orders, Creem webhooks, and historical Stripe webhooks have no language prefix. A valid language preference affects only the hosted sign-in interface through the official SDK's fixed `ui_locales=zh-CN|en` values; it does not change authentication or return-URL validation. See the [internationalization guide](../../docs/internationalization.md) for message and layout integration. The main site's avatar menu and profile page belong to `apps/web`.
 
-## 本地启动
+## Local Development
 
-在仓库根目录完成初始化：
+Initialize the application from the repository root:
 
 ```bash
 mise run setup
 mise identity dev
 ```
 
-默认地址为 `http://localhost:3001`。也可运行 `mise run dev-identity`；两者启动同一个应用。开发入口会先应用本地 D1 migrations。页面可在未配置供应商时打开，登录和支付相关服务会返回清晰的 503 状态。
+The default address is `http://localhost:3001`. You can also run `mise run dev-identity`; both commands start the same application. The development entry point applies local D1 migrations first. Pages remain accessible without provider configuration, while sign-in and payment services return clear 503 responses.
 
-日常操作统一使用 `mise identity <命令>`，也支持 `mise run identity:<命令>`：
+Use `mise identity <command>` for routine operations; `mise run identity:<command>` is also supported:
 
 ```bash
 mise identity help
-mise identity build             # Next.js 构建 + OpenNext/Workers 产物
-mise identity preview           # 本地 Workers runtime，端口 3001
+mise identity build             # Build Next.js and generate OpenNext/Workers artifacts
+mise identity preview           # Local Workers runtime on port 3001
 mise identity test
 mise identity coverage
-mise identity check-session     # 真实 SDK 的 Workerd 协议运行时验证
-mise identity verify            # 类型、lint、覆盖率、JWT 运行时、构建与打包
-mise identity deploy-dry-run    # 实际构建和打包，不发布
+mise identity check-session     # Verify the real SDK protocol in the Workerd runtime
+mise identity verify            # Types, lint, coverage, JWT runtime, build, and packaging
+mise identity deploy-dry-run    # Build and package without deploying
 mise identity wrangler --version
 ```
 
-Wrangler CLI 由 mise 安装并固定版本；OpenNext 的 Node API 与运行时检查仍使用 package 中相同精确版本的依赖。查看部署命令而不执行构建或发布，使用 `mise run --dry-run identity:deploy`。
+mise installs and pins the Wrangler CLI. OpenNext's Node API and runtime checks still use the package dependency pinned to the same exact version. To inspect the deployment command without building or deploying, run `mise run --dry-run identity:deploy`.
 
-环境文件：
+Environment files:
 
-- `apps/identity/.env.local`：仅公开的 Next.js 本地配置，密钥项保持为空。
-- `apps/identity/.dev.vars`：Next.js/OpenNext 本地绑定与真实本地密钥。
-- 两个文件均由 `setup` 在缺失时从 `.env.example` 创建，不会覆盖已有内容，且已被 Git 忽略。
-- 服务端优先读取 OpenNext/Workers bindings 中的非空值，再使用进程环境；`CREEM_MODE` 和历史 `STRIPE_MODE` 的显式空串保留并交给校验拒绝，不能回退到其他模式。避免两个本地文件中保留不一致的配置。
+- `apps/identity/.env.local`: public Next.js local configuration only; leave secret values empty.
+- `apps/identity/.dev.vars`: local Next.js/OpenNext bindings and actual local secrets.
+- `setup` creates either file from `.env.example` only when it is missing, preserves existing contents, and both files are ignored by Git.
+- The server prefers non-empty OpenNext/Workers binding values, then falls back to the process environment. Explicit empty strings for `CREEM_MODE` and the legacy `STRIPE_MODE` are preserved for validation to reject; they must not fall back to another mode. Avoid inconsistent configuration across the two local files.
 
-## 配置项
+## Configuration
 
-| 名称                    | 用途                                                                                                                                 | 配置位置                           |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
-| `APP_URL`               | 本应用的准确访问 origin，如本地 `http://localhost:3001` 或已部署的 HTTPS origin；不要带路径、query 或 fragment                       | 本地环境文件；远端 Worker Variable |
-| `LOGIN_URL`             | 统一认证 origin，作为 SDK baseUrl 和唯一 OIDC 回调主机；该精确主机展示登录页                                                         | 本地环境文件；远端 Worker Variable |
-| `AUTH_SUCCESS_URL`      | 网站默认返回地址的可信根 origin（默认使用其 /workspace）；正式地址使用 HTTPS，本地 loopback 可用 HTTP；未配置时使用 `APP_URL` 根地址 | 本地环境文件；远端 Worker Variable |
-| `LOGTO_ENDPOINT`        | Logto 租户访问地址，不带额外 `/oidc` 路径                                                                                            | 本地环境文件；远端 Worker Variable |
-| `LOGTO_USER_NAMESPACE`  | 本地用户表使用的固定租户标识；未设置时沿用 `LOGTO_ENDPOINT`，切换该租户域名前必须显式固定原值                                        | 本地环境文件；远端 Worker Variable |
-| `LOGTO_APP_ID`          | Logto Traditional web 应用 ID                                                                                                        | 本地环境文件；远端 Worker Variable |
-| `LOGTO_APP_SECRET`      | 同一应用的客户端密钥                                                                                                                 | 仅 `.dev.vars`；远端 Worker Secret |
-| `LOGTO_COOKIE_DOMAIN`   | 生产固定 `.loom-labs.ai`；本地 localhost 留空                                                                                        | 本地公开配置；远端 Worker Variable |
-| `LOGTO_COOKIE_SECRET`   | 至少 32 字符的随机密钥输入，用于派生 D1 会话状态加密密钥；共享应用、重启和重新部署时保持一致                                         | 仅 `.dev.vars`；远端 Worker Secret |
-| `CREEM_MODE`            | 当前仅接受 `test`；未设置时默认 test，显式空串、空白、live 及其他值拒绝；WWW 也配置相同值                                            | 本地公开配置；远端 Worker Variable |
-| `CREEM_PRODUCT_ID`      | USD 9.99 职业形象照包测试商品，当前为 `prod_6ntBKFLfAklD4ipCBu5exj`                                                                  | 本地公开配置；远端 Worker Variable |
-| `CREEM_PRO_PRODUCT_ID`  | USD 1.00 Loom Pro 测试商品，当前为 `prod_7axKhvtA10UxHeQlhFi91U`                                                                     | 本地公开配置；远端 Worker Variable |
-| `CREEM_API_KEY`         | 以 `creem_test_` 开头的测试密钥；SDK 显式请求测试 API，不根据请求选择环境                                                            | 仅 `.dev.vars`；远端 Worker Secret |
-| `CREEM_WEBHOOK_SECRET`  | Creem 测试 endpoint 的原文签名密钥，由 Pro 与职业照通知共享，业务归属仍按订单区分                                                    | 仅 `.dev.vars`；远端 Worker Secret |
-| `STRIPE_MODE`           | 历史订单与 Webhook 的模式；精确 `test` 或 `live`，仅未设置时默认 test，空串和非法值拒绝；当前保留 test                               | 本地公开配置；远端 Worker Variable |
-| `STRIPE_SECRET_KEY`     | 历史 Stripe 订单与退款查询密钥，必须与原模式、Price、Session 和事件一致；不用于新购买                                                | 仅 `.dev.vars`；远端 Worker Secret |
-| `STRIPE_WEBHOOK_SECRET` | 保留的历史 Stripe endpoint 对应 `whsec_` 签名密钥；CLI 转发与远端 endpoint 的密钥不同                                                | 仅 `.dev.vars`；远端 Worker Secret |
-| `STRIPE_PRICE_ID`       | 保留历史 Stripe 一次性固定 Price 配置，不改写既有订单金额或归属                                                                      | 本地环境文件；远端 Worker Variable |
-| `DB`                    | D1 binding，不是连接字符串                                                                                                           | `wrangler.jsonc` 的 `d1_databases` |
+| Name                    | Purpose                                                                                                                                                                                                                 | Where to configure                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `APP_URL`               | This application's exact origin, such as local `http://localhost:3001` or the deployed HTTPS origin; exclude paths, query strings, and fragments                                                                        | Local environment files; remote Worker Variable    |
+| `LOGIN_URL`             | Central authentication origin, used as the SDK baseUrl and sole OIDC callback host; this exact host serves the sign-in page                                                                                             | Local environment files; remote Worker Variable    |
+| `AUTH_SUCCESS_URL`      | Trusted root origin for the site's default return destination, which defaults to its /workspace path; use HTTPS for deployed addresses, with HTTP allowed for local loopback; defaults to the `APP_URL` root when unset | Local environment files; remote Worker Variable    |
+| `LOGTO_ENDPOINT`        | Logto tenant URL, without an additional `/oidc` path                                                                                                                                                                    | Local environment files; remote Worker Variable    |
+| `LOGTO_USER_NAMESPACE`  | Stable tenant identifier for the local users table; defaults to `LOGTO_ENDPOINT` when unset; explicitly pin the original value before changing the tenant domain                                                        | Local environment files; remote Worker Variable    |
+| `LOGTO_APP_ID`          | Logto Traditional web application ID                                                                                                                                                                                    | Local environment files; remote Worker Variable    |
+| `LOGTO_APP_SECRET`      | Client secret for the same application                                                                                                                                                                                  | `.dev.vars` only; remote Worker Secret             |
+| `LOGTO_COOKIE_DOMAIN`   | Fixed to `.loom-labs.ai` in production; leave empty for local localhost                                                                                                                                                 | Public local configuration; remote Worker Variable |
+| `LOGTO_COOKIE_SECRET`   | Random key input of at least 32 characters, used to derive the D1 session-state encryption key; keep it identical across shared applications, restarts, and redeployments                                               | `.dev.vars` only; remote Worker Secret             |
+| `CREEM_MODE`            | Currently accepts only `test`; defaults to test only when unset; rejects explicit empty strings, whitespace, live, and all other values; configure the same value in WWW                                                | Public local configuration; remote Worker Variable |
+| `CREEM_PRODUCT_ID`      | USD 9.99 professional headshot package test product, currently `prod_6ntBKFLfAklD4ipCBu5exj`                                                                                                                            | Public local configuration; remote Worker Variable |
+| `CREEM_PRO_PRODUCT_ID`  | USD 1.00 Loom Pro test product, currently `prod_7axKhvtA10UxHeQlhFi91U`                                                                                                                                                 | Public local configuration; remote Worker Variable |
+| `CREEM_API_KEY`         | Test key beginning with `creem_test_`; the SDK explicitly calls the test API and does not select the environment from a request                                                                                         | `.dev.vars` only; remote Worker Secret             |
+| `CREEM_WEBHOOK_SECRET`  | Signing secret for the raw request body at the Creem test endpoint, shared by Pro and headshot notifications; ownership is still determined per order                                                                   | `.dev.vars` only; remote Worker Secret             |
+| `STRIPE_MODE`           | Mode for historical orders and webhooks; exactly `test` or `live`, defaulting to test only when unset; rejects empty strings and invalid values; currently kept at test                                                 | Public local configuration; remote Worker Variable |
+| `STRIPE_SECRET_KEY`     | Key for historical Stripe order and refund queries; must match the original mode, Price, Session, and events; not used for new purchases                                                                                | `.dev.vars` only; remote Worker Secret             |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_` signing secret for the retained historical Stripe endpoint; CLI forwarding and the remote endpoint use different secrets                                                                                       | `.dev.vars` only; remote Worker Secret             |
+| `STRIPE_PRICE_ID`       | Retained fixed, one-time Stripe Price configuration for historical orders; does not change existing order amounts or ownership                                                                                          | Local environment files; remote Worker Variable    |
+| `DB`                    | D1 binding, not a connection string                                                                                                                                                                                     | `d1_databases` in `wrangler.jsonc`                 |
 
-可用 `openssl rand -base64 32` 生成 Cookie 密钥，再保存至本地文件或 Secret。不要提交实际凭据、将它们放入 `NEXT_PUBLIC_*`，或在命令行参数、页面、截图和日志中展示密钥。根 `.env` 不替代应用配置。
+Generate a cookie secret with `openssl rand -base64 32`, then save it in a local file or Secret. Do not commit actual credentials, put them in `NEXT_PUBLIC_*`, or expose secrets in command-line arguments, pages, screenshots, or logs. The root `.env` does not replace application configuration.
 
-## Logto 应用与上游身份源
+## Logto Applications and Upstream Identity Providers
 
-### 应用接入 Logto
+### Connecting the Application to Logto
 
-在 Logto 租户创建 **Traditional web** 类型的自有应用，将应用 ID、应用密钥和租户 endpoint 填入上述配置。本应用的两项登记地址为：
+Create your own **Traditional web** application in the Logto tenant and enter its application ID, application secret, and tenant endpoint in the configuration above. Register these two addresses for this application:
 
-| Logto 应用字段             | 地址                             |
+| Logto application field    | Address                          |
 | -------------------------- | -------------------------------- |
 | Redirect URI               | `${LOGIN_URL}/api/auth/callback` |
 | Post sign-out redirect URI | `${APP_URL}/`                    |
 
-本地和远端回调分别登记。SDK 的 baseUrl 统一使用 `LOGIN_URL`，生产回调为 `https://login.loom-labs.ai/api/auth/callback`，不从 Host 推导。产品 `/api/auth/login` 303 到中央登录页；`returnTo` 仅允许 HTTPS 规范 `*.loom-labs.ai`，排除 login/auth、userinfo、非标准端口及 hash，保留路径和原 query。已有有效共享会话直接回产品；匿名用户使用固定 Google/GitHub provider。目标保存在 D1 中加密的官方 SDK 登录状态中，浏览器只持有 10 分钟流程标识；回调验证 state、PKCE、issuer、audience 和签名后再验证目标。旧 `destination=website|checkout` 仅兼容固定目标，未知或重复参数拒绝。客户端不能指定任意 IdP target。
+Register local and remote callbacks separately. The SDK consistently uses `LOGIN_URL` as its baseUrl; the production callback is `https://login.loom-labs.ai/api/auth/callback`, never derived from Host. A product's `/api/auth/login` returns a 303 redirect to the central sign-in page. `returnTo` accepts only canonical HTTPS `*.loom-labs.ai` URLs, excluding login/auth destinations, userinfo, nonstandard ports, and fragments, while preserving the path and original query string. A valid shared session returns directly to the product; anonymous users use the fixed Google/GitHub providers. The destination is stored in the official SDK's encrypted sign-in state in D1; the browser holds only a 10-minute flow identifier. The callback validates state, PKCE, issuer, audience, and signatures before validating the destination again. Legacy `destination=website|checkout` supports only fixed destinations; unknown or duplicate parameters are rejected. Clients cannot specify arbitrary IdP targets.
 
-### 自定义域名与原用户归属
+### Custom Domains and Existing User Ownership
 
-以下为此前已验收的开发租户配置，保留作开发参考；生产目标和实际切换状态见[统一记录](../../docs/production-cutover.md)。login 与 checkout 绑定本 Worker，auth 是开发租户的 Logto 自定义域名。该配置下 GitHub 返回、Sandbox 付款与全额退款撤权，以及 Google 中央回调均已有历史验收。
+The configuration below was previously accepted for the development tenant and is retained as a development reference. See the [cutover record](../../docs/production-cutover.md) for production targets and actual cutover status. login and checkout are bound to this Worker; auth is the development tenant's custom Logto domain. Historical acceptance under this configuration covered GitHub returns, Sandbox payments, entitlement revocation after full refunds, and Google's central callback.
 
 ```dotenv
 APP_URL=https://checkout.loom-labs.ai
@@ -103,70 +103,70 @@ LOGTO_ENDPOINT=https://auth.loom-labs.ai
 LOGTO_USER_NAMESPACE=https://kpy72v.logto.app
 ```
 
-`login.loom-labs.ai` 与 `checkout.loom-labs.ai` 绑定本 Worker：前者展示统一登录页、发起与接收唯一 OIDC 回调，后者展示账户和购买页。`auth.loom-labs.ai` 是 Logto 托管认证，`www.loom-labs.ai` 由 apps/web 提供产品页面。所有产品进入 login，并携带经校验的完整 returnTo 路径及 query；有效共享会话直接回产品。Google/GitHub 的上游 connector 回调仍登记 Logto auth 域，不能与本应用 login 回调混淆。
+`login.loom-labs.ai` and `checkout.loom-labs.ai` are bound to this Worker. The former serves the central sign-in page and initiates and receives the sole OIDC callback; the latter serves account and purchase pages. `auth.loom-labs.ai` hosts Logto authentication, while `www.loom-labs.ai` serves product pages from apps/web. Every product goes through login with a validated, complete returnTo path and query string; a valid shared session returns directly to the product. Upstream Google/GitHub connector callbacks remain registered under the Logto auth domain and must not be confused with this application's login callback.
 
-协议验证与刷新由官方 `@logto/node/edge` 完成；Next cookies 只运输随机标识。生产会话 Cookie 为 `__Secure-loom_sid_<appId>`，流程 Cookie 为 `__Secure-loom_flow_<appId>`，均设置 `Domain=.loom-labs.ai; Path=/; HttpOnly; Secure; SameSite=Lax`。WWW/checkout/login 共用 D1、原 identity key、app ID、endpoint 与 namespace；令牌和 SDK 状态加密保存在 D1。父域 Cookie 会到达所有子域，应视为同一信任域。Creem 付款返回原语言的账号页或职业照页，以本地 `purchase_id` 查询订单；历史 Stripe Webhook 的路径与原文验签规则保留，不受登录跳转影响。
+The official `@logto/node/edge` SDK handles protocol validation and refresh. Next.js cookie APIs carry only random identifiers. The production session cookie is `__Secure-loom_sid_<appId>` and the flow cookie is `__Secure-loom_flow_<appId>`; both use `Domain=.loom-labs.ai; Path=/; HttpOnly; Secure; SameSite=Lax`. WWW/checkout/login share D1, the original identity key, app ID, endpoint, and namespace. Tokens and SDK state are stored encrypted in D1. Parent-domain cookies reach all subdomains, which must be treated as one trust boundary. Creem returns to the account or headshot page in the original language, where the local `purchase_id` is used to query the order. Historical Stripe webhook paths and raw-body signature validation remain in place and are unaffected by sign-in redirects.
 
-这次从自包含 Cookie 切换到 D1 会话：旧 `__Secure-loom_session_<appId>` 和 host-only `logto_<appId>` 均不再作为登录依据，已有用户需要一次重新登录。退出清理同 Domain/Path 的新旧父域 Cookie，以及当前 host 的旧 Cookie。原 `LOGTO_COOKIE_SECRET` 保留为服务端密钥派生输入，不能将其写入浏览器。
+The migration from self-contained cookies to D1 sessions means that neither the old `__Secure-loom_session_<appId>` cookie nor the host-only `logto_<appId>` cookie is accepted as proof of sign-in; existing users must sign in once again. Sign-out clears both old and new parent-domain cookies with matching Domain/Path values, along with the current host's legacy cookie. The original `LOGTO_COOKIE_SECRET` remains a server-side key derivation input and must never be written to the browser.
 
-仅在同一个 Logto 租户更换访问域名时，必须保持 `LOGTO_APP_ID`、Cookie 密钥及 `LOGTO_USER_NAMESPACE` 稳定。此前开发用户的 `users.issuer` 已保存原 endpoint，因此开发租户固定为 `https://kpy72v.logto.app`，无需改写数据库或重新关联订单。该字段表示固定的本地身份命名空间；实际 OIDC issuer 仍由 SDK 从当前 endpoint 的 discovery 获取并校验。生产租户另用自己的 namespace，不沿用开发值；命名空间不能用于自动合并其他租户，也不按邮箱匹配用户。未固定命名空间而直接换域可能触发用户主键冲突，应用会拒绝请求。
+When changing only the access domain of the same Logto tenant, keep `LOGTO_APP_ID`, the cookie secret, and `LOGTO_USER_NAMESPACE` stable. Existing development users have the original endpoint stored in `users.issuer`, so the development tenant's namespace is fixed to `https://kpy72v.logto.app`; no database rewrite or order reassociation is needed. This field represents a stable local identity namespace. The SDK still obtains and validates the actual OIDC issuer through discovery at the current endpoint. The production tenant uses its own namespace rather than the development value. Namespaces must not automatically merge identities from other tenants, and users are not matched by email. Changing domains without pinning the namespace can cause a user primary-key conflict, in which case the application rejects the request.
 
-### Google/GitHub 接入 Logto
+### Connecting Google/GitHub to Logto
 
-这一层使用另一组 OAuth 凭据和回调：**Google/GitHub → Logto**。已登录 Logto 管理台或创建开发租户，并不表示该租户已具备社交登录凭据。
+This layer uses a different set of OAuth credentials and callbacks: **Google/GitHub → Logto**. Signing in to the Logto console or creating a development tenant does not mean that the tenant already has social sign-in credentials.
 
-1. 在 Google Cloud 或 GitHub 创建自己控制的 OAuth 应用，取得对应 Client ID 和 Client Secret。
-2. 在 Logto 的 Social connectors 中添加 Google/GitHub，填写供应商凭据。
-3. 复制该 connector 显示的 Callback URI，登记到对应供应商的应用中。这里填写的是 **Logto 的 connector 回调**，不是本应用的 `/api/auth/callback`。
-4. 在 Logto 的 Sign-up and sign-in 中启用已配置的 connector，保存后再测试登录按钮。
+1. Create an OAuth application you control in Google Cloud or GitHub, and obtain its Client ID and Client Secret.
+2. Add Google/GitHub under Logto's Social connectors and enter the provider credentials.
+3. Copy the Callback URI shown for that connector and register it in the corresponding provider application. This is **Logto's connector callback**, not this application's `/api/auth/callback`.
+4. Enable the configured connector under Logto's Sign-up and sign-in, save, and then test the sign-in buttons.
 
-此前开发租户的 Google/GitHub 登记 auth.loom-labs.ai 与 kpy72v.logto.app 回调；生产租户使用 `5z8hdi.logto.app` 下的新 connector 回调，精确 ID 和 URI 见[对象表](../../docs/production-cutover.md)。产品 login 回调不能替代上游 connector 回调，旧开发配置不作为生产备用身份源。
+The development tenant previously registered Google/GitHub callbacks under auth.loom-labs.ai and kpy72v.logto.app. The production tenant uses new connector callbacks under `5z8hdi.logto.app`; see the [object inventory](../../docs/production-cutover.md) for exact IDs and URIs. The product login callback cannot replace upstream connector callbacks, and the old development configuration is not a fallback identity provider for production.
 
-Google 的测试受众需要包含实际测试账号；所需设置以该 OAuth 应用的受众、发布状态和 scope 为准。已有 Google OAuth client 可在允许的情况下新增 Logto 回调；GitHub OAuth App 按当前控制台登记准确回调，不覆盖其他应用仍在使用的地址，并禁用 wildcard。不要假定不同类型或版本的供应商应用具有相同的回调数量限制。
+Google's test audience must include the actual test account. Required settings depend on that OAuth application's audience, publishing status, and scopes. An existing Google OAuth client may add a Logto callback where permitted. For GitHub OAuth Apps, register the exact callback in the current console, preserve addresses still used by other applications, and disable wildcards. Do not assume that different provider application types or versions impose the same limit on callback URLs.
 
-本次 Google/GitHub 演示 connector 均已替换为自有专用凭据。其他开发租户若提供标记为“演示”的 connector，可按控制台说明用于开发验证。公开登录配置中的 `socialConnectors: []` 只说明当前未启用社交登录，不证明控制台不存在演示连接器。演示连接器不可用于生产，应按控制台提示在测试后删除或替换为自己控制的凭据；不保证每个租户都预置演示凭据。
+Both Google/GitHub demo connectors have been replaced with dedicated credentials under the user's control. If other development tenants offer connectors labeled as demos, they may be used for development verification according to the console instructions. `socialConnectors: []` in the public sign-in configuration means only that social sign-in is currently disabled; it does not prove that the console has no demo connectors. Demo connectors must not be used in production. After testing, delete them or replace them with credentials you control, as instructed by the console. Demo credentials are not guaranteed to be provisioned in every tenant.
 
-供应商 OAuth secrets 保存在 **Logto connector** 中，本应用不另设 `GOOGLE_CLIENT_SECRET` 或 `GITHUB_CLIENT_SECRET`。使用专用 OAuth 应用时，仍需完成上述供应商配置步骤。参考 [Google connector](https://docs.logto.io/integrations/google)、[GitHub connector](https://docs.logto.io/integrations/github)和[社交登录启用步骤](https://docs.logto.io/connectors/social-connectors)。
+Provider OAuth secrets are stored in the **Logto connector**; this application does not define separate `GOOGLE_CLIENT_SECRET` or `GITHUB_CLIENT_SECRET` values. Dedicated OAuth applications still require the provider configuration steps above. See the [Google connector](https://docs.logto.io/integrations/google), [GitHub connector](https://docs.logto.io/integrations/github), and [social sign-in setup](https://docs.logto.io/connectors/social-connectors).
 
-Logto 开发/生产租户由用户预先创建。以下记录属于此前开发租户验收：Google OAuth 测试受众新增 1 名自用账号，Google/GitHub 演示连接器均已替换为专用配置；GitHub 已在新旧入口完成真实登录。生产对象与当前切换状态以[生产切换说明](../../docs/production-cutover.md)为准，不把开发身份源的验收当作生产已完成。
+The user created the Logto development and production tenants in advance. The following results belong to historical development-tenant acceptance: 1 personal account was added to the Google OAuth test audience, both Google/GitHub demo connectors were replaced with dedicated configurations, and real GitHub sign-in completed through both the old and new entry points. Use the [production cutover guide](../../docs/production-cutover.md) for production objects and current cutover status; development identity-provider acceptance does not establish production readiness.
 
-早期开发租户 Google 测试曾到达同邮箱账号的显式关联页，并按用户选择停止该分支。后续开发租户验收中，Google 已从官方账号选择、Logto 回调进入 WWW，应用识别为此前同一身份；只读设置显示当时已有 GitHub 与 Google 连接，该轮未执行关联、合并或连接编辑。该历史 Google/GitHub 三域识别与退出记录不代表本次生产租户完整登录已通过；生产同邮箱自动关联已关闭。
+An early Google test in the development tenant reached the explicit account-linking page for accounts with the same email address, and that branch was stopped at the user's request. During later development-tenant acceptance, Google proceeded from the official account chooser through the Logto callback to WWW, where the application recognized the same existing identity. Read-only settings showed existing GitHub and Google connections; no linking, merging, or connection edits were performed in that run. These historical Google/GitHub results for identity recognition and sign-out across three domains do not establish that a complete sign-in flow has passed for the production tenant. Automatic same-email linking is disabled in production.
 
-生产 Free 租户已保存并重载浅深主色、Dark mode 与 [Custom CSS](../../docs/logto-branding.css)。此前开发租户真实 GitHub 回调的内联 CSS 和 Loom 装饰仅作历史效果记录；生产本轮尚待完整授权验收。原生 Company logo/Favicon 未上传，Powered by Logto 保留，未启用 Pro。配置范围与回滚见[Logto 品牌配置](../../docs/logto-branding.md)。
+The production Free tenant has saved and reloaded light/dark primary colors, Dark mode, and [Custom CSS](../../docs/logto-branding.css). The inline CSS and Loom decoration observed in a real GitHub callback for the development tenant are retained only as historical visual evidence. End-to-end authorization validation for production remains pending in this phase. Native Company logo/Favicon assets have not been uploaded, Powered by Logto remains visible, and Pro has not been enabled. See [Logto branding](../../docs/logto-branding.md) for the configuration scope and rollback instructions.
 
-开发租户包含开发标识和用户数据保留限制，不作为生产用户库。正式上线应单独核实套餐、配额和迁移安排。参考 [Logto 租户说明](https://docs.logto.io/logto-cloud/tenant-settings)。
+Development tenants carry development labels and user-data retention limits and must not serve as the production user database. Verify plans, quotas, and migration arrangements separately before production launch. See [Logto tenant settings](https://docs.logto.io/logto-cloud/tenant-settings).
 
-### 会话边界
+### Session Boundaries
 
-成功回调创建固定 14 天的 D1 应用会话，截止时间不随访问或令牌刷新延长。登录中的流程状态只有 10 分钟。`auth_sessions` 只保存随机 SID 的 SHA-256 哈希与 HKDF/AES-GCM 加密的 SDK 状态；浏览器不持有 ID、access 或 refresh token。
+A successful callback creates a D1 application session with a fixed 14-day lifetime. Requests and token refreshes never extend its expiry. Sign-in flow state lasts only 10 minutes. `auth_sessions` stores only SHA-256 hashes of random SIDs and HKDF/AES-GCM-encrypted SDK state; the browser holds no ID, access, or refresh tokens.
 
-请求先检查 D1 会话未到期、未撤销，再读取身份声明。身份令牌或 access token 剩余有效期不超过 60 秒，或 access token 缓存缺失、异常时，服务端通过官方 SDK 的 `clearAccessToken()` / `getAccessToken()` 刷新，重新读取并校验身份；RSC 无需写 Cookie。跨 Worker 刷新使用 D1 `first-primary`、版本比较更新及 30 秒租约，每个 SDK 请求最多 5 秒，协议操作总计最多 20 秒。等待活跃租约超出上限返回 `session_busy`；租约过期或刷新结果不确定时撤销会话，避免重放可能已消耗的 refresh token。
+Requests first check that the D1 session is neither expired nor revoked, then read identity claims. When an ID token or access token has 60 seconds or less remaining, or the access-token cache is missing or invalid, the server refreshes through the official SDK's `clearAccessToken()` / `getAccessToken()` methods, then rereads and validates the identity. RSC reads do not need to write cookies. Refreshes across Workers use D1 `first-primary`, version-based compare-and-update, and a 30-second lease. Each SDK request is limited to 5 seconds, with a 20-second total limit for protocol operations. Waiting beyond the limit for an active lease returns `session_busy`. An expired lease or uncertain refresh outcome revokes the session to avoid replaying a refresh token that may already have been consumed.
 
-退出登录仅接受准确同源的 POST，先撤销 D1 中当前会话及关联流程，再由 SDK 尽力撤销上游 refresh token；适配层在 finally 中清除 Cookie，最终以 303 执行 Logto 登出。已撤销 SID 的复制件不能在后续请求中恢复会话；并发刷新和已知关联流程的迟到回调也不能重新启用它。统一退出作用于当前 Cookie 标识的共享会话与流程，不是用户所有设备，也不撤销无关联的独立新授权；已开始执行的业务操作不会被倒退取消。
+Sign-out accepts only POST requests from the exact same origin. It first revokes the current session and associated flows in D1, then uses the SDK to revoke the upstream refresh token on a best-effort basis. The adapter clears cookies in finally, and the final 303 redirect performs Logto sign-out. A copied, revoked SID cannot restore the session on a later request; concurrent refreshes and late callbacks from known associated flows cannot reactivate it either. Shared sign-out covers only the shared session and flows identified by the current cookie, not all of the user's devices or unrelated, independently initiated new authorizations. Business operations already in progress are not retroactively canceled.
 
-14 天是应用允许的最长绝对期限，不是无条件免登录承诺。清除 Cookie、主动退出、上游令牌失效、密钥或 endpoint 变化，以及安全异常都可能提前要求重新登录。尚未接入 Logto 控制台禁用用户的实时回通道。应用使用稳定的 `(租户命名空间, subject)` 记录用户，不以邮箱关联购买；ID Token 不作为通用业务 API 的 bearer token。详细设计、迁移与验证边界见[会话生命周期](../../docs/session-lifecycle.md)。
+The 14-day period is the maximum absolute lifetime the application permits, not an unconditional promise that sign-in will never be required sooner. Clearing cookies, signing out, upstream token invalidation, key or endpoint changes, and security anomalies may require earlier sign-in. A real-time back channel for user disablement in the Logto console has not been integrated. The application identifies users by a stable `(tenant namespace, subject)` pair and does not associate purchases by email. ID Tokens are not used as general business API bearer tokens. See the [session lifecycle guide](../../docs/session-lifecycle.md) for the detailed design, migration, and verification boundaries.
 
-## 历史 Stripe 订单与模式隔离
+## Historical Stripe Orders and Mode Isolation
 
-本节记录历史 Stripe 协议和验收；新 Loom Pro 购买通过 `/api/checkout` 创建 Creem Checkout，`/api/orders/[id]` 按用户归属读取新订单或历史订单。新商品和当前测试卡使用 [Creem 接入说明](../../docs/creem-test-integration.md)，不再创建 Stripe 购买。
+This section records the historical Stripe protocol and acceptance results. New Loom Pro purchases create Creem Checkout through `/api/checkout`, and `/api/orders/[id]` reads new or historical orders subject to user ownership. Use the [Creem integration guide](../../docs/creem-test-integration.md) for new products and current test cards; new Stripe purchases are no longer created.
 
-历史 Stripe 协议通过 `STRIPE_MODE=test|live` 明确选择模式；只有未配置时默认 test，空白或非法值拒绝，不从密钥推断 Live。密钥、Price、Session、PaymentIntent、事件和来源订单必须匹配模式。当时使用 Sandbox，Live 未开启；保留的正式价格校验不代表已开放真实收款。
+The historical Stripe protocol explicitly selects its mode through `STRIPE_MODE=test|live`. It defaults to test only when unset and rejects whitespace or invalid values; Live is never inferred from keys. Keys, Price, Session, PaymentIntent, events, and originating orders must all match the selected mode. That phase used Sandbox with Live disabled. Retained validation for production prices does not mean real payments are enabled.
 
-`orders` 与 `stripe_events` 保存模式，历史记录由 `0003` 标为 test。新订单显式使用 payload 版本 2，metadata 写入模式；旧 test-v1 重试保留原请求体及幂等键，不新增 currency 或模式 metadata，只有该分支允许旧 metadata 缺少模式。live-v1 和未知版本拒绝。权益必须来自同用户、同产品和功能的已付款订单，且与当前模式匹配；test 接受 v1/v2，live 只接受 v2。独立数据库和身份切换规则见[生产切换说明](../../docs/production-cutover.md)。
+`orders` and `stripe_events` store the mode, and migration `0003` marks historical records as test. New orders explicitly use payload version 2 and include the mode in metadata. Legacy test-v1 retries preserve the original request body and idempotency key without adding currency or mode metadata; only this branch allows legacy metadata to omit the mode. live-v1 and unknown versions are rejected. Entitlements must come from paid orders belonging to the same user, product, and feature, with a mode matching the current configuration. test accepts v1/v2; live accepts only v2. See the [production cutover guide](../../docs/production-cutover.md) for database isolation and identity cutover rules.
 
-历史 Stripe 购买流程（保留协议说明，当前不用于创建新购买）：
+Historical Stripe purchase flow, retained as a protocol reference and no longer used to create new purchases:
 
-1. 已登录用户发起 Checkout，客户端仅提交 UUID `requestId`，失败重试复用同一个值。
-2. 服务端从会话取得用户，读取并校验 Price，先在 D1 保存本地订单，再使用与订单绑定的幂等键创建 Checkout。
-3. 托管收银台完成测试付款后，页面返回并查询本用户订单；最多查询 15 次、间隔 2 秒，失败或仍在处理中可点击“刷新状态”重试。
-4. Webhook 验签后，服务端重新读取 Stripe 的 Session、PaymentIntent 和退款现状，核对订单归属、Price、金额、币种与数量，原子记录事件、订单及权益。
-5. `/api/premium` 每次从服务端会话取得身份并查询 D1 有效权益。成功页 query、客户端用户 ID 或按钮状态都不能授予权限。
+1. A signed-in user starts Checkout. The client submits only a UUID `requestId` and reuses it for retries after failure.
+2. The server derives the user from the session, reads and validates the Price, saves a local order in D1, and then creates Checkout with an idempotency key bound to that order.
+3. After the hosted checkout completes a test payment, the page returns and queries the current user's order up to 15 times at 2-second intervals. If a query fails or processing is still underway, the user can select “Refresh status” to retry.
+4. After validating the webhook signature, the server rereads Stripe's Session, PaymentIntent, and current refund state, checks order ownership, Price, amount, currency, and quantity, and atomically records the event, order, and entitlements.
+5. `/api/premium` derives the identity from the server-side session and queries valid D1 entitlements on every request. Success-page query parameters, client-supplied user IDs, and button state cannot grant access.
 
-该阶段固定数量 1、仅卡支付，关闭优惠码、自动税及自动本地化定价。历史 Stripe 测试卡信息见 [Stripe 官方测试文档](https://docs.stripe.com/testing)；当前新购买须使用 [Creem 测试卡](https://docs.creem.io/getting-started/test-mode)，不要输入真实卡。
+That phase fixed quantity at 1, accepted cards only, and disabled promotion codes, automatic tax, and automatic localized pricing. Historical Stripe test cards are documented in the [official Stripe testing guide](https://docs.stripe.com/testing). Current new purchases must use [Creem test cards](https://docs.creem.io/getting-started/test-mode); do not enter real card details.
 
 ### Webhook
 
-历史 Stripe Webhook 使用 `${APP_URL}/api/webhooks/stripe`。当时 endpoint 已从原 workers.dev 更新为 `https://checkout.loom-labs.ai/api/webhooks/stripe` 并回读确认；该阶段实际付款通知、退款撤权和高级接口拒绝均已验证。保留登记以下事件，不把历史结果作为新 Creem 链路验收：
+The historical Stripe webhook uses `${APP_URL}/api/webhooks/stripe`. Its endpoint was changed from the original workers.dev address to `https://checkout.loom-labs.ai/api/webhooks/stripe` and read back to confirm the update. Actual payment notifications, entitlement revocation after refunds, and premium API rejection were verified in that phase. Keep these event subscriptions registered; historical results do not establish acceptance of the new Creem flow:
 
 - `checkout.session.completed`
 - `checkout.session.expired`
@@ -174,19 +174,19 @@ Logto 开发/生产租户由用户预先创建。以下记录属于此前开发�
 - `refund.created`
 - `refund.updated`
 
-使用该 endpoint 对应的签名密钥配置 `STRIPE_WEBHOOK_SECRET`。本地可用 Stripe CLI 将同一 Sandbox 的事件转发至 `http://localhost:3001/api/webhooks/stripe`，并使用 CLI 本次输出的签名密钥；不要与远端 endpoint 密钥混用。参考 [Stripe Webhook](https://docs.stripe.com/webhooks)。
+Set `STRIPE_WEBHOOK_SECRET` to this endpoint's signing secret. For local development, Stripe CLI can forward events from the same Sandbox to `http://localhost:3001/api/webhooks/stripe`; use the signing secret printed by that CLI session, not the remote endpoint's secret. See [Stripe webhooks](https://docs.stripe.com/webhooks).
 
-Webhook 使用原始请求体和异步签名校验，不要求用户登录或浏览器 Origin。D1 事件处理标记与订单/权益变更在同一 batch 提交；失败返回错误，允许 Stripe 重送。已付款状态不会被迟到的过期事件覆盖。
+The webhook uses the raw request body and asynchronous signature verification. It requires neither user sign-in nor a browser Origin. D1 event-processing markers and order/entitlement changes are committed in the same batch. Failures return an error so Stripe can retry delivery. A late expiration event cannot overwrite a paid state.
 
-### 退款和恢复
+### Refunds and Recovery
 
-- 已成功退款金额累计达到原订单金额时，订单标记为 `refunded`，撤回这笔订单的权益。
-- 部分退款、待处理或失败退款不撤回已有权益；本期没有按比例降级规则。
-- 支付确认时也会重新检查成功退款，避免“退款先到、付款通知后到”重新开通。
-- 权益按订单分别保存；一笔退款不会撤回其他有效订单支撑的权限。
-- 该阶段没有应用内退款按钮或定时对账服务。历史退款在 Stripe Sandbox 中发起，问题事件可在 Stripe 中检查并重送；页面刷新只查询状态，不代替 Webhook 确认。
+- When the total successfully refunded amount reaches the original order amount, mark the order as `refunded` and revoke that order's entitlements.
+- Partial, pending, or failed refunds do not revoke existing entitlements; this phase has no proportional downgrade rules.
+- Payment confirmation also rechecks successful refunds to prevent a payment notification arriving after a refund from restoring access.
+- Entitlements are stored separately per order. Refunding one order does not revoke access supported by other valid orders.
+- That phase has no in-app refund button or scheduled reconciliation service. Historical refunds are initiated in Stripe Sandbox, and problematic events can be inspected and redelivered in Stripe. Refreshing the page only queries status and does not replace webhook confirmation.
 
-## 本地验证与 Workers 预览
+## Local Validation and Workers Preview
 
 ```bash
 mise identity check-types
@@ -197,33 +197,33 @@ mise identity build
 mise identity preview
 ```
 
-`next dev` 主要运行在 Node.js；`preview` 使用 `wrangler.jsonc` 的独立 `env.preview`，清空远端 Custom Domain routes，先执行该环境的本地 D1 迁移，再构建并以 `--env preview --local` 启动 Workers runtime，不对远端数据库应用迁移。
+`next dev` runs primarily in Node.js. `preview` uses the separate `env.preview` in `wrangler.jsonc`, clears remote Custom Domain routes, applies that environment's local D1 migrations, then builds and starts the Workers runtime with `--env preview --local`. It does not apply migrations to a remote database.
 
-中央登录预览为 `http://localhost:3001`，WWW 为 `http://localhost:3000`。两应用本地使用相同 Cookie key 和 localhost（Domain 留空），统一 LOGIN_URL=localhost:3001、AUTH_SUCCESS_URL=localhost:3000。预览清空生产 routes，不放宽正式准确 Origin 检查；真实本地 OAuth 需登记中央 localhost:3001 回调。
+The central sign-in preview runs at `http://localhost:3001`, and WWW at `http://localhost:3000`. Both applications use the same local cookie key and localhost, with Domain left empty, LOGIN_URL=localhost:3001, and AUTH_SUCCESS_URL=localhost:3000. Preview clears production routes without relaxing the exact production Origin checks. Real local OAuth requires registering the central localhost:3001 callback.
 
-以下为此前英文默认、正式产品文案、居中登录、默认自动轮播和菜单图标的历史验收。全仓 `mise run verify` 当时返回 0；identity-core 263、identity 149、web 32、i18n 10，共 454 项测试通过，旧 Worker 4 项另计。本地真实 Workerd 共享会话 9/9、本地 HTTP 67/67、线上独立 HTTP 67/67 通过。当时 identity 版本 `17aeae33-1ab4-450e-af1e-074e7a690576`、WWW 版本 `a39d3bf2-e75b-492c-9af7-fe3cb14ac9a0` 均已读回为 100% 流量；GitHub 完整返回 `/workspace?source=login-polish&keep=a%2Bb`，Google 也已完成开发租户应用回调并进入 WWW。这些结果不代表生产身份切换已验收。
+The following are historical acceptance results for English defaults, standard product copy, centered sign-in controls, the automatically playing carousel, and menu icons. At that time, the repository-wide `mise run verify` returned 0. identity-core passed 263 tests, identity 149, web 32, and i18n 10, for a total of 454, with 4 legacy Worker tests counted separately. Actual local Workerd shared-session checks passed 9/9, local HTTP checks 67/67, and independent online HTTP checks 67/67. Readback confirmed that identity version `17aeae33-1ab4-450e-af1e-074e7a690576` and WWW version `a39d3bf2-e75b-492c-9af7-fe3cb14ac9a0` each served 100% of traffic. GitHub returned to the complete `/workspace?source=login-polish&keep=a%2Bb` URL, and Google also completed the development-tenant application callback and reached WWW. These results do not establish acceptance of the production identity cutover.
 
-此前 D1 会话认证 checkpoint：identity 为 `9e04b462-53e1-4660-8636-3c13139b00cc`，WWW 为 `3b1091f9-a959-4352-91ac-54b6f0731811`，`0002_sessions.sql` 已应用。当时 core 239、identity 137、WWW 24，共 400 项测试通过；core 覆盖率为 statements 98.17%、branches 95.47%、functions 100%、lines 98.75%。真实 GitHub 三域共享登录、官方 SDK 刷新、共享退出及受控绝对到期拒绝已验证；不将此称为真实等待 14 天。本地 Workerd 9 组通过。该会话机制继续沿用，证据见[会话生命周期](../../docs/session-lifecycle.md)。
+At the earlier D1 session authentication checkpoint, identity was `9e04b462-53e1-4660-8636-3c13139b00cc`, WWW was `3b1091f9-a959-4352-91ac-54b6f0731811`, and `0002_sessions.sql` had been applied. core passed 239 tests, identity 137, and WWW 24, for a total of 400. core coverage was 98.17% statements, 95.47% branches, 100% functions, and 98.75% lines. Verification covered real GitHub shared sign-in across three domains, official SDK refresh, shared sign-out, and rejection at a controlled absolute expiry; this was not a test that actually waited 14 days. All 9 local Workerd groups passed. The session mechanism remains in use; see the [session lifecycle guide](../../docs/session-lifecycle.md) for evidence.
 
-以下是 2026-10-23 上一版自包含父域 Cookie 的真实记录：登录与购买 Worker 为 `a4224f5a-c2f1-427f-87c5-2fb94f03cce2`，WWW 为 `c7fbf7c8-c45a-45e5-b6d2-7ae7c15a0b85`。全仓验证、本地 Workerd 和 60 项线上匿名检查通过；真实 GitHub 三域共享登录、有效会话返回原产品、共享退出、USD 1.00 Sandbox 付款后主站运行、退出重登持权，以及全额退款后原会话拒绝访问均已完成。最终有效权益为 0；旧有两项 pending 购买意图未改动。浏览器和订单证据分别为 `shared-domain-browser-e2e.json` 与 `shared-domain-billing.json`，完整步骤与对象清单见[飞书操作记录](https://bytedance.larkoffice.com/docx/O5IUdAY2bon0L1x72gucn73NnOh)。
+The following is the actual record for the previous self-contained parent-domain cookie version on 2026-10-23: the sign-in and purchase Worker was `a4224f5a-c2f1-427f-87c5-2fb94f03cce2`, and WWW was `c7fbf7c8-c45a-45e5-b6d2-7ae7c15a0b85`. Repository-wide validation, local Workerd checks, and 60 online anonymous checks passed. Verification covered real GitHub shared sign-in across three domains, returning users with valid sessions to their original product, shared sign-out, main-site execution after a USD 1.00 Sandbox payment, retained entitlements after signing out and back in, and denial of access to the original session after a full refund. The final valid entitlement count was 0; the 2 existing pending purchase intents were unchanged. Browser and order evidence is in `shared-domain-browser-e2e.json` and `shared-domain-billing.json`, respectively. See the [Feishu operation record](https://bytedance.larkoffice.com/docx/O5IUdAY2bon0L1x72gucn73NnOh) for complete steps and the object inventory.
 
-以下是此前独立会话方案的历史记录，不作为本轮父域共享会话的验收依据：当时域名方案已通过全仓 `mise run verify` 和 182 项测试；核心服务端/API 覆盖率为 statements 98.57%、branches 98.06%、functions 100%、lines 99.39%。Workers 本地预览、本地 D1 smoke、远端 D1 健康检查和 9 项匿名边界检查已通过。
+The following historical results belong to the earlier independent-session design and are not acceptance evidence for the current parent-domain shared session: that domain setup passed the repository-wide `mise run verify` and 182 tests. Core server/API coverage was 98.57% statements, 98.06% branches, 100% functions, and 99.39% lines. Local Workers preview, local D1 smoke tests, remote D1 health checks, and 9 anonymous boundary checks passed.
 
-旧 workers.dev 入口已完成 GitHub 登录、Sandbox 付款、重登持权及全额退款撤权，证据位于 `.codex-artifacts/identity/browser-e2e.json` 和 `cloud-e2e-billing.json`。
+The old workers.dev entry point completed GitHub sign-in, Sandbox payment, entitlement retention after signing in again, and revocation after a full refund. Evidence is in `.codex-artifacts/identity/browser-e2e.json` and `cloud-e2e-billing.json`.
 
-早期新域名版本已验证 GitHub 的 website/checkout 两种返回、USD 1.00 付款开通、退出重登持权，以及成功全额退款后的 D1 撤权和高级接口拒绝；当时 D1 用户数保持为 1。证据位于 `custom-domain-browser-e2e.json` 与 `custom-domain-billing.json`。该阶段的 Google 只验证至显式关联页；本轮已完成的 Google 应用回调结果见上文。
+An early version on the new domains verified both GitHub website/checkout return destinations, activation after a USD 1.00 payment, entitlement retention after signing out and back in, and D1 revocation plus premium API rejection after a successful full refund. The D1 user count remained 1. Evidence is in `custom-domain-browser-e2e.json` and `custom-domain-billing.json`. Google verification in that phase reached only the explicit account-linking page; see above for the subsequently completed Google application callback results.
 
-适配 Logto SDK 时，Next.js 构建曾选择 jose 的 Node 导出，导致本次 Workerd 环境的 ES384 验签不兼容。现将直接依赖固定为 `jose@5.10.0`，开发与构建显式使用 webpack，并将精确的 `jose$` alias 指向该库官方 WebCrypto 导出；SDK 的签名、issuer 和 audience 校验保持启用。`scripts/check-jose-runtime.mjs` 已在 Workerd 验证合法 ES384 签名、篡改签名、错误 issuer、错误 audience 四项行为。该修复针对本次依赖与构建路径，不表示 Cloudflare 全面不支持 Node crypto。
+During Logto SDK integration, the Next.js build selected jose's Node exports, causing incompatible ES384 signature verification in the Workerd environment used for this integration. The direct dependency is now pinned to `jose@5.10.0`, development and builds explicitly use webpack, and an exact `jose$` alias points to the library's official WebCrypto exports. The SDK's signature, issuer, and audience checks remain enabled. `scripts/check-jose-runtime.mjs` verified four behaviors in Workerd: a valid ES384 signature, a tampered signature, a wrong issuer, and a wrong audience. This fix addresses the dependencies and build path used here; it does not imply that Cloudflare generally lacks Node crypto support.
 
-真实联调至少检查：登录后 `/api/me` 取得当前用户；未登录访问高级接口为 401、未购买为 403；付款后关闭页面仍由 Webhook 开通；伪造成功页不能开通；重复事件不重复授予权益；成功全额退款撤回对应订单权益。会话还须检查跨产品自动刷新、刷新失败拒绝访问、退出后 SID 重放、并发刷新/退出，以及固定第 14 天边界；时间推进与合成协议测试不能称为真实等待 14 天的验证。
+Real integration testing must at least verify that `/api/me` returns the current user after sign-in; premium APIs return 401 for anonymous users and 403 for users without a purchase; webhooks grant access even if the page is closed after payment; a forged success page cannot grant access; duplicate events do not duplicate entitlements; and a successful full refund revokes only the corresponding order's entitlements. Session checks must also cover automatic refresh across products, denial after refresh failure, SID replay after sign-out, concurrent refresh/sign-out, and the fixed 14-day boundary. Advancing time and using synthetic protocol tests must not be described as verification that actually waited 14 days.
 
-## Cloudflare 部署
+## Cloudflare Deployment
 
-`wrangler.jsonc` 的目标 Worker 名为 `loom-identity`，入口为 `.open-next/worker.js`，静态资源为 `.open-next/assets`，D1 binding 为 `DB`。原地更名时旧 D1 `hotkey-tools-identity` 及既有数据保持不变；本次生产身份切换另用独立 D1，目标与进度见[生产切换说明](../../docs/production-cutover.md)。默认不配置 R2 缓存，动态用户数据不使用共享缓存。参考 [Cloudflare Next.js](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/)和 [OpenNext 配置](https://opennext.js.org/cloudflare/get-started)。
+`wrangler.jsonc` targets the `loom-identity` Worker, with `.open-next/worker.js` as its entry point, `.open-next/assets` for static assets, and `DB` as its D1 binding. The in-place rename preserved the old `hotkey-tools-identity` D1 database and its existing data. The production identity cutover uses a separate D1 database; see the [production cutover guide](../../docs/production-cutover.md) for targets and progress. R2 caching is not configured by default, and dynamic user data does not use shared caches. See [Cloudflare Next.js](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/) and [OpenNext configuration](https://opennext.js.org/cloudflare/get-started).
 
-2026-10-23 已将 Cloudflare 中既有 `hotkey-tools-identity` Worker 原地更名为 `loom-identity`，本地 `name` 与云端一致。更名后回读确认既有部署仍承接 100% 流量，Secrets、D1 binding 及 `login.loom-labs.ai` / `checkout.loom-labs.ai` 自定义域名保留。后续类似迁移不要仅修改 `name` 后直接部署，以免创建另一 Worker；应先完成云端原地更名并回查绑定。Secrets 只核对名称，不输出值；不改会话密钥、Logto 参数、Stripe Webhook 或其他业务标识。
+On 2026-10-23, the existing `hotkey-tools-identity` Worker in Cloudflare was renamed in place to `loom-identity`, matching the local `name`. Readback confirmed that the existing deployment still served 100% of traffic and that Secrets, the D1 binding, and the `login.loom-labs.ai` / `checkout.loom-labs.ai` custom domains were retained. For similar migrations, do not simply change `name` and deploy, which may create a different Worker. Complete the cloud-side in-place rename first, then read back the bindings. Inspect Secret names only, without exposing their values. Do not change the session key, Logto parameters, Stripe webhook, or other business identifiers.
 
-在仓库根目录执行：
+Run from the repository root:
 
 ```bash
 mise identity login
@@ -231,15 +231,15 @@ mise identity status
 mise identity db-create
 ```
 
-将输出的真实 `database_id` 填入本应用 `wrangler.jsonc`。应用远端迁移：
+Enter the actual `database_id` from the output in this application's `wrangler.jsonc`. Apply remote migrations:
 
 ```bash
 mise identity db-migrate
 ```
 
-首次尚未创建 Worker 时，可以先部署配置未完整的应用，页面将显示待配置；之后补齐配置并重新部署。不要因此把该次发布当作登录或付款已通过。
+If the Worker does not yet exist, you may deploy the application with incomplete configuration first; pages will indicate that configuration is pending. Complete the configuration afterward and redeploy. That initial deployment does not establish successful sign-in or payment integration.
 
-在 Worker Variables 中设置 `APP_URL`、`LOGTO_ENDPOINT`、`LOGTO_APP_ID`、`CREEM_MODE=test`、`CREEM_PRODUCT_ID`、`CREEM_PRO_PRODUCT_ID`，按目标配置 `LOGIN_URL`、`AUTH_SUCCESS_URL` 与固定 `LOGTO_USER_NAMESPACE`；在 Worker Secrets 中分别设置当前四项密钥，也可用下列交互命令逐个输入：
+Set `APP_URL`, `LOGTO_ENDPOINT`, `LOGTO_APP_ID`, `CREEM_MODE=test`, `CREEM_PRODUCT_ID`, and `CREEM_PRO_PRODUCT_ID` in Worker Variables. Configure `LOGIN_URL`, `AUTH_SUCCESS_URL`, and the fixed `LOGTO_USER_NAMESPACE` for the target environment. Set the four current secrets separately in Worker Secrets, or enter them one at a time with these interactive commands:
 
 ```bash
 mise identity wrangler secret put LOGTO_APP_SECRET
@@ -248,41 +248,41 @@ mise identity wrangler secret put CREEM_API_KEY
 mise identity wrangler secret put CREEM_WEBHOOK_SECRET
 ```
 
-历史 `STRIPE_MODE=test`、`STRIPE_PRICE_ID` 和 Stripe Secrets 继续保留处理原订单与退款，不用 Creem 商品或密钥替换这些历史配置。
+Retain the historical `STRIPE_MODE=test`, `STRIPE_PRICE_ID`, and Stripe Secrets to handle original orders and refunds. Do not replace these historical settings with Creem products or keys.
 
-本应用 APP_URL 为 checkout，WWW 的 APP_URL 为 www，仅用于各自页面/API 与准确 Origin 检查。两应用 SDK baseUrl 统一 LOGIN_URL=login，OIDC 回调仅在 login；同一环境的 Cookie Domain=.loom-labs.ai、D1、app ID、会话密钥、endpoint 和 namespace 全部一致。目标库先顺序应用 `0001`—`0006`，再发布读取新字段的 Identity 与 WWW；两应用当前均设置 `CREEM_MODE=test`。跨租户不迁移旧会话，使用新生产密钥且重新登录；旧数据库保留，不能按邮箱迁入测试权益。Creem 与保留的 Stripe endpoint 均指向 checkout。之后运行：
+This application's APP_URL is checkout, while WWW's APP_URL is www; each is used only for its own pages/APIs and exact Origin checks. Both applications use LOGIN_URL=login as the SDK baseUrl, with OIDC callbacks handled only on login. Within an environment, Cookie Domain=.loom-labs.ai, D1, app ID, session key, endpoint, and namespace must all match. Apply `0001`–`0006` to the target database in order before deploying Identity and WWW versions that read the new fields. Both applications currently set `CREEM_MODE=test`. Do not migrate old sessions across tenants; use a new production key and require users to sign in again. Retain the old database and never migrate test entitlements by matching email addresses. Both Creem and the retained Stripe endpoint point to checkout. Then run:
 
 ```bash
 mise identity deploy
 mise run web:deploy
 ```
 
-远端首次部署前须确认迁移、Variables 和 Secrets 都已设置。应用的远端迁移/部署命令会拒绝全零数据库 UUID；`deploy:dry-run` 只检查打包，不创建资源或验证供应商账号。以免费资源运行的可行性仍需核实实际 Worker 包大小、CPU 和账户配额；项目不会自动升级套餐。
+Before the first remote deployment, confirm that migrations, Variables, and Secrets are configured. The application's remote migration/deployment commands reject an all-zero database UUID. `deploy:dry-run` checks packaging only; it neither creates resources nor validates provider accounts. Feasibility on free resources still depends on the actual Worker bundle size, CPU usage, and account quotas. The project does not automatically upgrade plans.
 
-## 数据与接口
+## Data and APIs
 
-`migrations/0001_identity.sql` 包含 `users`、`orders`、`entitlements`、`stripe_events`；`0002_sessions.sql` 新增 `auth_sessions`；`0003_stripe_mode.sql` 为 Stripe 订单和事件增加模式并将历史记录标为 test；`0004_checkout_payload_version.sql` 为历史 Stripe Checkout 请求保留版本 1，后续 Stripe 订单显式使用 2。`0005_creem_headshot_packs.sql` 新增 `creem_orders`、`creem_events` 与 `headshot_packs`；`0006_creem_pro.sql` 在保留这些记录和关联关系的前提下扩展 Creem 订单，允许独立的 USD 1.00 Pro，并新增 `creem_pro_entitlements`。迁移按顺序应用，不能修改已应用文件。本地、测试支付与未来真实收款的数据边界分别管理，不要将远端资源误当成本地测试库。
+`migrations/0001_identity.sql` contains `users`, `orders`, `entitlements`, and `stripe_events`. `0002_sessions.sql` adds `auth_sessions`. `0003_stripe_mode.sql` adds the mode to Stripe orders and events and marks historical records as test. `0004_checkout_payload_version.sql` preserves version 1 for historical Stripe Checkout requests; subsequent Stripe orders explicitly use 2. `0005_creem_headshot_packs.sql` adds `creem_orders`, `creem_events`, and `headshot_packs`. `0006_creem_pro.sql` extends Creem orders to support a separate USD 1.00 Pro purchase and adds `creem_pro_entitlements`, while preserving existing records and relationships. Apply migrations in order and never modify files that have already been applied. Manage local data, test payments, and future real-payment data separately; do not mistake remote resources for a local test database.
 
-| 路由                                 | 行为                                                                      |
-| ------------------------------------ | ------------------------------------------------------------------------- |
-| `GET /api/health`                    | 检查 D1 binding 和迁移后的表                                              |
-| `GET /api/auth/login`                | 产品跳中央页；中央允许固定 provider 和受信 returnTo                       |
-| `GET /api/auth/callback`             | SDK 校验后仅返回受信产品路径与 query，拒绝 hash                           |
-| `POST /api/auth/logout`              | 同源；D1 撤销会话、清 Cookie，再 303 登出                                 |
-| `GET /api/me`                        | 当前用户与 `{ premium }` 权益；匿名用户返回 `user: null`                  |
-| `POST /api/checkout`                 | 同源、已登录；创建或恢复该用户的 Creem Pro 购买，提交 requestId 与 locale |
-| `GET /api/orders/:id`                | 仅返回当前用户的 Creem Pro 或历史 Stripe 订单                             |
-| `GET /api/premium`                   | 要求已登录且存在有效权益                                                  |
-| `GET /api/headshot_packs`            | 当前测试商品、本人订单和职业照套餐权益                                    |
-| `POST /api/headshot_checkout`        | 同源、已登录；创建或恢复独立职业照购买                                    |
-| `GET /api/headshot_orders/:order_id` | 仅返回当前用户的职业照订单                                                |
-| `POST /api/webhooks/creem`           | 原文验签、API 核实当前交易；按 Pro 或职业照订单发权/撤权                  |
-| `POST /api/webhooks/stripe`          | 历史通知原文验签，核对原模式并处理原订单及权益                            |
+| Route                                | Behavior                                                                                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/health`                    | Check the D1 binding and migrated tables                                                                                                |
+| `GET /api/auth/login`                | Redirect products to the central page; the central page accepts fixed providers and trusted returnTo destinations                       |
+| `GET /api/auth/callback`             | After SDK validation, return only to trusted product paths and query strings; reject fragments                                          |
+| `POST /api/auth/logout`              | Same-origin only; revoke the D1 session, clear cookies, and perform sign-out with a 303 redirect                                        |
+| `GET /api/me`                        | Current user and `{ premium }` entitlements; return `user: null` for anonymous users                                                    |
+| `POST /api/checkout`                 | Same-origin and authenticated; create or resume the current user's Creem Pro purchase, with requestId and locale submitted              |
+| `GET /api/orders/:id`                | Return only the current user's Creem Pro or historical Stripe order                                                                     |
+| `GET /api/premium`                   | Require sign-in and valid entitlements                                                                                                  |
+| `GET /api/headshot_packs`            | Current test product, the current user's orders, and headshot package entitlements                                                      |
+| `POST /api/headshot_checkout`        | Same-origin and authenticated; create or resume a separate headshot purchase                                                            |
+| `GET /api/headshot_orders/:order_id` | Return only the current user's headshot order                                                                                           |
+| `POST /api/webhooks/creem`           | Validate the raw-body signature and verify the current transaction through the API; grant/revoke entitlements per Pro or headshot order |
+| `POST /api/webhooks/stripe`          | Validate raw-body signatures for historical notifications, check the original mode, and process original orders and entitlements        |
 
-自有 JSON API 成功返回 `{ code: 0, msg: "success", data }`，失败返回 `{ code, msg, error: { type } }` 并保留相应 HTTP status；业务码集中在 `src/server/http-codes.ts`。私有数据响应使用 `private, no-store`。登录跳转按 OIDC 流程返回，不套 JSON 格式。
+Application-owned JSON APIs return `{ code: 0, msg: "success", data }` on success and `{ code, msg, error: { type } }` on failure, with the appropriate HTTP status. Business codes are centralized in `src/server/http-codes.ts`. Private-data responses use `private, no-store`. Sign-in redirects follow the OIDC flow rather than the JSON response format.
 
-前端由 `_pages/identity` 组合 `features/manage-access` 管理 Pro，`_pages/headshots` 组合 `features/headshot-purchase` 管理职业照套餐；共享请求解析位于 `shared/api`，通用组件和主题位于根 `packages/ui`；浏览器不导入 `src/server`。
+On the frontend, `_pages/identity` composes `features/manage-access` for Pro, and `_pages/headshots` composes `features/headshot-purchase` for headshot packages. Shared request parsing lives in `shared/api`, while generic components and themes live in the root `packages/ui`. Browser code must not import `src/server`.
 
-### 本地密钥与构建产物
+### Local Secrets and Build Artifacts
 
-真实 Logto / Creem 密钥及保留的历史 Stripe 密钥只存于已忽略的 `.dev.vars`，生产使用 Cloudflare Secret。`.env.local` 仅填写公开配置，其密钥项保持为空：OpenNext 1.20 会把 `.env*` 的值编入 Worker；`.dev.vars` 不参与这份编译，Next 开发通过 Cloudflare binding 获取其中的本地密钥。不要将真实凭据复制回 `.env.local`。构建前的 `check-worker-env.mjs` 会检查仓库根和应用的各模式 dotenv 文件，发现非空密钥配置即拒绝构建；只打印文件及变量名。
+Actual Logto / Creem secrets and retained historical Stripe secrets belong only in the ignored `.dev.vars`; production uses Cloudflare Secrets. `.env.local` contains only public configuration, with secret values left empty. OpenNext 1.20 embeds `.env*` values into the Worker. `.dev.vars` is not included in that compilation; Next development reads its local secrets through Cloudflare bindings. Do not copy actual credentials back into `.env.local`. Before building, `check-worker-env.mjs` checks dotenv files for every mode at the repository root and application level and rejects non-empty secret settings. It prints only file and variable names.

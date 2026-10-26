@@ -1,31 +1,31 @@
 # loom-web
 
-[loom-web](https://github.com/loom-ailabs/loom-web) 包含 Loom AI 产品首页与工作区（`apps/web`）以及登录与购买应用（`apps/identity`）。两者分别使用 Next.js/OpenNext 提供页面与同源 API，共享 `.loom-labs.ai` 下的登录会话、Logto 身份与 Cloudflare D1 权益。默认 `mise run dev` 仍启动账户与购买应用；主站使用 `mise run dev-web`。
+[loom-web](https://github.com/loom-ailabs/loom-web) contains the Loom AI product homepage and workspace (`apps/web`), along with the sign-in and purchase application (`apps/identity`). Each application uses Next.js/OpenNext to serve pages and same-origin APIs. They share sign-in sessions, Logto identities, and Cloudflare D1 entitlements under `.loom-labs.ai`. The default `mise run dev` command still starts the account and purchase application; use `mise run dev-web` for the main site.
 
-从初始化、身份源配置到支付联调的步骤见 [Identity 应用说明](apps/identity/README.md)。仓库工作约定见 [AGENTS.md](AGENTS.md)。
+See the [Identity application guide](apps/identity/README.md) for setup, identity provider configuration, and payment integration testing. Repository conventions are documented in [AGENTS.md](AGENTS.md).
 
-两 Worker 使用 Logto 生产 Free 身份与独立 D1。全站新购买已统一 Creem Test mode：Loom Pro 为 USD 1.00，职业形象照包为 USD 9.99；均不会真实扣款。Stripe 保留历史订单查询和退款处理。当前配置与验收见 [Creem 接入说明](docs/creem-test-integration.md)，原身份切换记录见[生产切换说明](docs/production-cutover.md)。
+Both Workers use the Logto production tenant on the Free plan and a dedicated D1 database. All new purchases across the site now use Creem Test mode: USD 1.00 for Loom Pro and USD 9.99 for the professional headshot package. Neither purchase incurs a real charge. Stripe remains available for historical order queries and refund processing. See the [Creem integration guide](docs/creem-test-integration.md) for the current configuration and acceptance results, and the [production cutover guide](docs/production-cutover.md) for the identity migration record.
 
-职业形象照包是独立的 Creem Test 商品：USD 9.99 单次购买，按订单记录 4 张成片及 1 次重做的套餐权益，支持重复购买与全额退款撤权。入口为账户应用的 `/headshots`、`/zh/headshots`；照片上传、生成和下载尚未开放。职业照套餐不授予 Loom Pro，两种商品的来源订单和退款撤权分别处理。配置与分阶段验收见 [Creem 测试支付接入](docs/creem-test-integration.md)。
+The professional headshot package is a separate Creem Test product: a USD 9.99 one-time purchase records an entitlement to 4 finished photos and 1 redo per order. Repeat purchases and entitlement revocation after a full refund are supported. The entry points are `/headshots` and `/zh/headshots` in the account application; photo upload, generation, and download are not yet available. Headshot packages do not grant Loom Pro. The two products track their originating orders and revoke entitlements after refunds independently. See the [Creem test payment integration guide](docs/creem-test-integration.md) for configuration and staged acceptance checks.
 
-## 应用与共享包
+## Applications and shared packages
 
-| 目录                          | 技术栈                                                       | 职责                                                      |
-| ----------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
-| `apps/identity`               | Next.js 16、React 19、Tailwind CSS 4、Logto、Creem、OpenNext | 默认产品：账户、购买、订单与付费鉴权；页面和 API 同源     |
-| `packages/ui`                 | shadcn/ui 风格组件、Tailwind 主题变量、`cn()`                | 共享 Button、Card、Badge、Alert 等基础组件                |
-| `apps/web`                    | Next.js 16、React 19、TypeScript                             | Loom AI 主站、工作区与受保护功能 API                      |
-| `apps/worker`                 | TypeScript、Hono、Wrangler、D1                               | 既有静态资源托管、示例 API 与 Python service binding 网关 |
-| `apps/python`                 | Python 3.13、FastAPI、Pydantic                               | 快捷键规范化示例，可运行于 CPython 或 Python Worker       |
-| `packages/python/hotkey-core` | Python、uv workspace                                         | Python 共享业务库                                         |
+| Directory                     | Stack                                                        | Responsibility                                                                                              |
+| ----------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `apps/identity`               | Next.js 16, React 19, Tailwind CSS 4, Logto, Creem, OpenNext | Default product: accounts, purchases, orders, and paid access authorization; pages and APIs share an origin |
+| `packages/ui`                 | shadcn/ui-style components, Tailwind theme variables, `cn()` | Shared UI primitives such as Button, Card, Badge, and Alert                                                 |
+| `apps/web`                    | Next.js 16, React 19, TypeScript                             | Loom AI main site, workspace, and protected feature APIs                                                    |
+| `apps/worker`                 | TypeScript, Hono, Wrangler, D1                               | Existing static asset hosting, example APIs, and a gateway to Python via a service binding                  |
+| `apps/python`                 | Python 3.13, FastAPI, Pydantic                               | Hotkey normalization example that runs on CPython or as a Python Worker                                     |
+| `packages/python/hotkey-core` | Python, uv workspace                                         | Shared Python business logic library                                                                        |
 
-新产品使用 `apps/<产品名>` 下的独立 Next.js 全栈应用。共享认证、HTTP 与权益查询位于 `packages/identity-core`；支付 SDK 与 Webhook 只在 `apps/identity`。旧 `apps/worker` 使用自己的静态占位页与示例 API。Python 仅在实际需要时作为独立能力服务使用。
+Each new product uses a separate full-stack Next.js application under `apps/<product_name>`. Shared authentication, HTTP handling, and entitlement queries live in `packages/identity-core`; payment SDKs and webhooks live only in `apps/identity`. The legacy `apps/worker` has its own static placeholder page and example APIs. Python is used as a separate service only when a capability actually requires it.
 
-仓库更名不改变现有包名和运行标识：文档中的 `@hotkey-tools/*`、`hotkey-tools-core`、数据库名及订单业务标识仍与实际配置一致；历史部署记录保留当时的资源名称。
+Renaming the repository does not change existing package names or runtime identifiers. References to `@hotkey-tools/*`, `hotkey-tools-core`, database names, and order identifiers still match the actual configuration; historical deployment records retain the resource names used at the time.
 
-## 初始化与日常开发
+## Setup and daily development
 
-安装 mise 后，在仓库根目录执行：
+After installing mise, run the following from the repository root:
 
 ```bash
 mise trust
@@ -34,109 +34,109 @@ mise run env-check
 mise run dev
 ```
 
-默认访问 `http://localhost:3001`。`dev` 会先应用 Identity 本地 D1 migrations，再启动 Next.js 开发服务器；Cloudflare bindings 由 OpenNext 提供本地模拟。
+The default URL is `http://localhost:3001`. The `dev` task applies Identity's local D1 migrations before starting the Next.js development server. OpenNext provides local emulation of Cloudflare bindings.
 
-`setup` 安装工具链、按锁文件安装 pnpm 依赖及 uv workspace 成员，在文件缺失时创建根 `.env`、Identity 的 `.env.local` 与 `.dev.vars`，并应用各应用数据库的本地迁移。重复执行不会覆盖已有环境文件或重置数据库。Logto 和 Creem 凭据按 [应用说明](apps/identity/README.md) 配置；历史 Stripe Webhook 保留原凭据。配置不完整时相关 API 返回 503。
+The `setup` task installs the toolchain, installs pnpm dependencies and uv workspace members from the lockfiles, creates the root `.env` and Identity's `.env.local` and `.dev.vars` only if they are missing, and applies local migrations for each application's database. Repeated runs do not overwrite existing environment files or reset databases. Configure Logto and Creem credentials as described in the [application guide](apps/identity/README.md); retain the original credentials for historical Stripe webhooks. Affected APIs return 503 when configuration is incomplete.
 
-| 命令                                     | 用途                                           |
-| ---------------------------------------- | ---------------------------------------------- |
-| `mise run dev` / `mise run dev-identity` | 启动默认账户与购买应用，端口 3001              |
-| `mise run smoke`                         | 对默认应用做页面、D1、私有 API 与跨站拒绝检查  |
-| `mise run dev-examples`                  | 启动既有静态 Web、网关和 Python Worker 示例    |
-| `mise run dev-web`                       | Loom AI 主站热更新，端口 3000                  |
-| `mise run dev-worker`                    | 构建静态 Web、迁移示例 D1、启动网关，端口 8787 |
-| `mise run dev-python`                    | Python Worker，端口 8788                       |
-| `mise run dev-python-local`              | CPython + Uvicorn，端口 8000                   |
-| `mise run smoke-examples`                | 检查既有网关、D1 与 Python 链路                |
+| Command                                  | Purpose                                                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `mise run dev` / `mise run dev-identity` | Start the default account and purchase application on port 3001                                  |
+| `mise run smoke`                         | Check pages, D1, private APIs, and cross-site request rejection in the default application       |
+| `mise run dev-examples`                  | Start the existing static web, gateway, and Python Worker examples                               |
+| `mise run dev-web`                       | Run the Loom AI main site with hot reload on port 3000                                           |
+| `mise run dev-worker`                    | Build the static web assets, migrate the example D1 database, and start the gateway on port 8787 |
+| `mise run dev-python`                    | Run the Python Worker on port 8788                                                               |
+| `mise run dev-python-local`              | Run CPython + Uvicorn on port 8000                                                               |
+| `mise run smoke-examples`                | Check the existing gateway, D1, and Python integration                                           |
 
-mise 固定 Node.js 24、pnpm 12.10.1、Python 3.13、uv 0.12.3 和 Wrangler 4.151.2。`mise run setup` 会安装这些工具。使用 `mise exec -- <command>` 执行临时命令，不修改全局工具版本。根 `.env` 服务于 workspace 和旧示例；Identity 的服务端配置放在应用自己的环境文件或 Worker 环境中。任何密钥都不能使用 `NEXT_PUBLIC_*`。
+mise pins Node.js 24, pnpm 12.10.1, Python 3.13, uv 0.12.3, and Wrangler 4.151.2. `mise run setup` installs these tools. Use `mise exec -- <command>` for one-off commands without changing global tool versions. The root `.env` serves the workspace and legacy examples; Identity's server configuration belongs in its own environment files or Worker environment. Never expose secrets through `NEXT_PUBLIC_*`.
 
-Identity 的日常操作统一使用 `mise identity <命令>`；运行 `mise identity help` 查看全部命令：
+Use `mise identity <command>` for routine Identity operations. Run `mise identity help` for the full command list:
 
-| 命令                                                   | 用途                                             |
-| ------------------------------------------------------ | ------------------------------------------------ |
-| `mise identity dev`                                    | 启动 Next.js 开发服务，先迁移本地 D1             |
-| `mise identity build`                                  | 构建 Next.js，并生成 OpenNext/Workers 部署产物   |
-| `mise identity preview`                                | 迁移本地 D1、构建并在 Workers runtime 预览       |
-| `mise identity test` / `mise identity coverage`        | 测试与覆盖率检查                                 |
-| `mise identity verify`                                 | 依次检查类型、lint、覆盖率、JWT 运行时和部署打包 |
-| `mise identity deploy-dry-run`                         | 构建并检查打包，不发布远端资源                   |
-| `mise identity deploy`                                 | 检查配置、构建并发布 Worker                      |
-| `mise identity db-create` / `mise identity db-migrate` | 创建远端 D1 / 应用远端迁移                       |
-| `mise identity db-migrate-local`                       | 应用本地 D1 迁移                                 |
-| `mise identity login` / `mise identity status`         | Cloudflare 登录 / 登录状态                       |
-| `mise identity logs`                                   | 订阅远端 Worker 日志                             |
-| `mise identity wrangler <参数...>`                     | 在 Identity 目录使用 mise 管理的 Wrangler        |
+| Command                                                | Purpose                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `mise identity dev`                                    | Apply local D1 migrations, then start the Next.js development server               |
+| `mise identity build`                                  | Build Next.js and generate OpenNext/Workers deployment artifacts                   |
+| `mise identity preview`                                | Apply local D1 migrations, build, and preview in the Workers runtime               |
+| `mise identity test` / `mise identity coverage`        | Run tests and coverage checks                                                      |
+| `mise identity verify`                                 | Run type, lint, coverage, JWT runtime, and deployment packaging checks in sequence |
+| `mise identity deploy-dry-run`                         | Build and check the deployment package without publishing remote resources         |
+| `mise identity deploy`                                 | Validate configuration, build, and publish the Worker                              |
+| `mise identity db-create` / `mise identity db-migrate` | Create a remote D1 database / apply remote migrations                              |
+| `mise identity db-migrate-local`                       | Apply local D1 migrations                                                          |
+| `mise identity login` / `mise identity status`         | Sign in to Cloudflare / check sign-in status                                       |
+| `mise identity logs`                                   | Stream remote Worker logs                                                          |
+| `mise identity wrangler <args...>`                     | Run the mise-managed Wrangler from the Identity directory                          |
 
-这些入口对应 `mise run identity:<命令>`。检查命令将执行哪些步骤，可用 `mise run --dry-run identity:deploy`；它与实际构建打包的 `mise identity deploy-dry-run` 不同。原有 `mise run dev-identity`、`identity-db-*` 入口作为别名保留。
+These commands correspond to `mise run identity:<command>`. To inspect the steps a task will execute, use `mise run --dry-run identity:deploy`. This differs from `mise identity deploy-dry-run`, which actually builds and checks the package. The original `mise run dev-identity` and `identity-db-*` entry points remain as aliases.
 
-OpenNext 和本地验证需要导入 Wrangler 的 Node API，pywrangler 也会通过 npx 调用项目中的 Wrangler，因此 package 中仍保留必要依赖，统一精确固定为 mise 的相同版本；升级 Wrangler 时需同步修改工具配置、package 和锁文件。[mise npm 工具说明](https://mise.jdx.dev/dev-tools/backends/npm)
+OpenNext and local verification import Wrangler's Node API, and pywrangler invokes the project's Wrangler through npx. The required package dependencies therefore remain in place, pinned to the exact same version as mise. When upgrading Wrangler, update the tool configuration, packages, and lockfile together. See the [mise npm backend documentation](https://mise.jdx.dev/dev-tools/backends/npm).
 
-## 验证
+## Verification
 
 ```bash
 mise run verify
 mise identity coverage
 ```
 
-`verify` 检查 uv 锁文件，执行类型检查、Oxlint/Ruff、格式检查、Vitest/pytest、各 package 构建，以及全部 Worker 的部署打包检查。Identity 的覆盖率检查范围为服务端和 HTTP API，四项阈值均为 90%。
+The `verify` task checks the uv lockfile and runs type checks, Oxlint/Ruff, formatting checks, Vitest/pytest, builds for each package, and deployment packaging checks for all Workers. Identity's coverage checks cover server code and HTTP APIs, with a 90% threshold for all four metrics.
 
-以下是此前默认英文、产品措辞、导航账号状态复用、登录轮播与菜单图标的历史验收。全仓 `mise run verify` 当时返回 0；identity-core 263、identity 149、web 32、i18n 10，共 454 项测试通过，旧 Worker 的 4 项另计。本地真实 Workerd 共享会话 9/9、本地 HTTP 67/67 和线上独立 HTTP 67/67 通过。当时 WWW 版本为 `a39d3bf2-e75b-492c-9af7-fe3cb14ac9a0`，identity 为 `17aeae33-1ab4-450e-af1e-074e7a690576`，部署读回确认两者均承接 100% 流量；这些版本与测试不作为本次生产身份切换的证据。
+The following are historical acceptance results for English as the default language, product wording, reuse of the navigation account state, the sign-in carousel, and menu icons. At that time, the full-repository `mise run verify` exited with code 0. A total of 454 tests passed: 263 in identity-core, 149 in identity, 32 in web, and 10 in i18n, plus 4 separate tests for the legacy Worker. Shared-session checks in a real local Workerd runtime passed 9/9; local HTTP checks and independent online HTTP checks each passed 67/67. The WWW version was `a39d3bf2-e75b-492c-9af7-fe3cb14ac9a0`, and the Identity version was `17aeae33-1ab4-450e-af1e-074e7a690576`. Reading back deployment state confirmed that each served 100% of its traffic. These versions and tests are not evidence for the production identity cutover.
 
-早期域名方案曾通过全仓 `mise run verify` 和 182 项测试；当时 Identity 核心覆盖率为 statements 98.57%、branches 98.06%、functions 100%、lines 99.39%。旧 workers.dev 入口已完成真实 GitHub 登录、USD 1.00 Sandbox 付款开通、退出重登后持权及全额退款撤权；Workers 本地预览、本地 D1 smoke 和远端健康检查也已通过。
+An earlier domain configuration passed the full-repository `mise run verify` and 182 tests. Identity core coverage at that time was 98.57% statements, 98.06% branches, 100% functions, and 99.39% lines. The old workers.dev entry point was verified with a real GitHub sign-in, a USD 1.00 Sandbox payment that granted access, retained access after signing out and back in, and entitlement revocation after a full refund. Local Workers preview, a local D1 smoke check, and remote health checks also passed.
 
-页面域名分工为 `login.loom-labs.ai` 统一登录与回调、`checkout.loom-labs.ai` 账户与购买；Logto 托管认证由 `LOGTO_ENDPOINT` 指定，`auth.loom-labs.ai` 是开发租户入口。产品携带 `returnTo` 跳转登录页；会话有效时直接返回原产品，否则完成登录后返回。返回地址只接受受信任的 Loom 产品地址并保留路径与查询，拒绝含片段的地址。www 与 checkout 通过同一随机 SID Cookie（`Domain=.loom-labs.ai`）访问 D1 会话，不再分别进行 OIDC 登录；令牌状态只以密文保存在 D1，两者从 D1 查询同一用户在当前支付模式下的有效权益。
+`login.loom-labs.ai` handles centralized sign-in and callbacks; `checkout.loom-labs.ai` provides accounts and purchases. `LOGTO_ENDPOINT` specifies Logto's hosted authentication service, and `auth.loom-labs.ai` is the development tenant's entry point. Products redirect to the sign-in page with `returnTo`. A valid session returns directly to the original product; otherwise, the user signs in before returning. Return URLs must point to trusted Loom products, preserve valid paths and queries, and contain no fragment. WWW and checkout access D1 sessions through the same random SID cookie (`Domain=.loom-labs.ai`) instead of performing separate OIDC sign-ins. Token state is stored only as ciphertext in D1, and both applications query D1 for the same user's valid entitlements in the current payment mode.
 
-此前认证 checkpoint 已部署固定 14 天 D1 会话与短期令牌自动刷新：期限从成功回调起计算，刷新不延长期限；退出以 D1 撤销为准。当时 400 项测试、全仓验证、真实 Workerd 协议检查及 53 项线上匿名检查通过；真实 GitHub 三域共享登录、有效会话直接返回、官方 SDK 刷新与共享退出已验证。受控缩短测试会话截止时间后的三域拒绝，以及重新登录均已通过；这不是实际等待 14 天。该机制继续沿用，旧自包含 Cookie 不再接受；详见[会话生命周期](docs/session-lifecycle.md)。
+A previous authentication checkpoint deployed D1 sessions with a fixed 14-day lifetime and automatic refresh of short-lived tokens. The lifetime starts at the successful callback and is not extended by refresh; D1 revocation is authoritative for sign-out. At that time, 400 tests, full-repository verification, protocol checks in a real Workerd runtime, and 53 anonymous online checks passed. Real GitHub sign-in shared across three domains, direct return with a valid session, refresh through the official SDK, and shared sign-out were verified. Access rejection on all three domains after a controlled reduction of a test session's expiration time, followed by successful sign-in again, also passed; this did not involve waiting 14 days. This mechanism remains in use, and the old self-contained cookies are no longer accepted. See the [session lifecycle guide](docs/session-lifecycle.md).
 
-Logto 开发/生产租户由用户预先创建；此前验收只使用开发租户，生产切换进度见[统一记录](docs/production-cutover.md)。既有付款开通、退出重登持权及全额退款撤权保留为历史。当时真实 GitHub 登录完整返回 `/workspace?source=login-polish&keep=a%2Bb`；Google 也已从官方账号选择、Logto 回调进入 WWW，并识别为此前同一身份。Logto 用户设置的只读检查显示既有 GitHub 与 Google 连接，该轮未执行关联、合并或连接编辑，也不按邮箱自动合并账号。
+The user created the Logto development and production tenants in advance. Earlier acceptance checks used only the development tenant; see the [production cutover record](docs/production-cutover.md) for migration progress. Previous payment, access retention after signing out and back in, and full-refund revocation checks remain historical evidence. At that time, a real GitHub sign-in returned with the complete URL `/workspace?source=login-polish&keep=a%2Bb`. Google sign-in also went through the official account picker and Logto callback to WWW, where it was recognized as the same existing identity. A read-only check of Logto user settings showed the existing GitHub and Google connections. That round of verification did not link or merge accounts or edit connections; accounts are not automatically merged by email.
 
-`next build`、OpenNext build、Wrangler dry-run、本地预览、真实第三方联调与远端部署是不同的验证层级。打包或本地测试通过，不代表已完成远端迁移、登录、付款或免费套餐容量验证。
+`next build`, OpenNext build, Wrangler dry-run, local preview, real third-party integration testing, and remote deployment are separate levels of verification. Successful packaging or local tests do not establish that remote migrations, sign-in, payments, or Free plan capacity have been verified.
 
-## Cloudflare 部署
+## Cloudflare deployment
 
-Identity 使用 Workers + Static Assets + D1。页面与 API 由一个 Next.js/OpenNext Worker 提供；当前动态页面不需要 R2 ISR 缓存，也不依赖 Durable Objects、容器或独立 Node 服务器。应使用 Next.js 的 Node.js runtime 和 `nodejs_compat`，不设置 `output: "export"` 或 `runtime = "edge"`。
+Identity uses Workers + Static Assets + D1. A single Next.js/OpenNext Worker serves pages and APIs. The current dynamic pages do not require an R2 ISR cache, Durable Objects, containers, or a separate Node server. Use the Next.js Node.js runtime with `nodejs_compat`; do not set `output: "export"` or `runtime = "edge"`.
 
-先配置真实账号、数据库和密钥，再部署：
+Configure a real account, database, and secrets before deploying:
 
 ```bash
 mise identity login
 mise identity status
 mise identity db-create
-# 将输出的 database_id 填入 apps/identity/wrangler.jsonc
+# Set database_id in apps/identity/wrangler.jsonc to the value returned above
 mise identity db-migrate
-# 配置 APP_URL、Logto、Creem Test 和 Worker Secrets，见应用说明
+# Configure APP_URL, Logto, Creem Test, and Worker Secrets; see the application guide
 mise identity deploy
 ```
 
-Identity 使用自己的 `apps/identity/migrations` 与 D1 数据库，不复用旧网关的数据库。全零 UUID 只供本地模拟；远端迁移和部署入口会拒绝该占位值。后续结构变更新增 migration，不改写已应用的迁移。
+Identity uses its own `apps/identity/migrations` and D1 database rather than reusing the legacy gateway database. The all-zero UUID is for local emulation only; remote migration and deployment commands reject this placeholder. Add new migrations for future schema changes instead of rewriting migrations that have already been applied.
 
-目标以 Cloudflare 免费资源验证，但项目不会自动选择、升级或证明某个套餐的可用额度；Worker 包大小、CPU、请求和 D1 配额需以实际账户及部署结果核实。参考 [Cloudflare Next.js](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/)、[Workers 定价](https://developers.cloudflare.com/workers/platform/pricing/)和 [D1 定价](https://developers.cloudflare.com/d1/platform/pricing/)。
+The goal is to validate the application using Cloudflare's free resources, but the project does not automatically select or upgrade a plan or establish its available capacity. Verify Worker bundle size, CPU, request, and D1 quotas against the actual account and deployment results. See [Cloudflare Next.js](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/), [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/), and [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/).
 
-既有示例的远端部署继续使用旧网关数据库与独立 Python Worker：
+Remote deployment of the existing examples continues to use the legacy gateway database and a separate Python Worker:
 
 ```bash
 mise run cloudflare-db-create
-# 将旧网关的 database_id 填入 apps/worker/wrangler.jsonc
+# Set the legacy gateway's database_id in apps/worker/wrangler.jsonc
 mise run cloudflare-db-migrate
 mise exec -- pnpm deploy:examples
 ```
 
-该入口按 Python Worker → Web 构建/网关 Worker 的顺序执行；Python Worker 通过 service binding 提供服务。旧网关 `/api/hotkeys` 与 `/api/normalize` 仅用于技术链路演示，没有 Identity 的用户隔离和付费校验。
+This command deploys the Python Worker first, then builds the web assets and deploys the gateway Worker. The Python Worker is accessed through a service binding. The legacy gateway's `/api/hotkeys` and `/api/normalize` endpoints only demonstrate the technical integration; they do not provide Identity's user isolation or paid access checks.
 
-## Loom AI 主站
+## Loom AI main site
 
-两应用通过 `packages/i18n` 共享 next-intl 中英文能力：英文默认使用根路径，中文使用 `/zh`；旧 `/en` 页面地址保留 query 并规范跳转到对应英文根路径。共享语言菜单按 English、简体中文排序，保留用户已保存的偏好。语言与浅色、深色、跟随系统外观使用仅含偏好值的父域 Cookie。个人信息页 `/account`、`/zh/account` 禁止索引；API、登录回调和支付端点不加语言前缀，认证与权益规则保持不变。配置、消息分工和 SEO 说明见[国际化说明](docs/internationalization.md)。
+Both applications share next-intl support for English and Chinese through `packages/i18n`. English uses root paths by default, and Chinese uses `/zh`. Legacy `/en` page URLs preserve the query and redirect to the corresponding canonical English root path. The shared language menu lists “English” before “简体中文” (Simplified Chinese) and preserves the user's saved preference. Language and appearance preferences (light, dark, or system) use parent-domain cookies containing only preference values. The profile pages `/account` and `/zh/account` must not be indexed. APIs, sign-in callbacks, and payment endpoints have no locale prefix; authentication and entitlement rules remain unchanged. See the [internationalization guide](docs/internationalization.md) for configuration, message ownership, and SEO details.
 
-导航账号状态由布局中的 `ProductAccessProvider` 在客户端路由间保留；首次完整加载读取一次，不在窗口聚焦、页面可见性变化、定时器或客户端路由切换时重新同步。用户可手动刷新状态，受保护操作仍逐次检查服务端会话和权益。导航不显示“Syncing”等同步文字；头像外框为 28px（边框内图片 26px），点击范围为 40px，四项菜单图标均为 16px。登录操作区居中，右侧轮播默认自动播放，可视控制只保留分页点，并保留键盘可达的暂停/播放与减少动态效果支持。本地浏览器验证从愿景进入工作区不新增 `/api/me` 请求，手动刷新新增一次；线上也确认客户端导航不重复读取账号。
+The layout's `ProductAccessProvider` preserves the navigation account state across client-side routes. It reads the state once on the initial full page load and does not resynchronize on window focus, visibility changes, timers, or client-side navigation. Users can refresh the state manually; protected operations still check the server-side session and entitlements on every request. The navigation shows no status text such as “Syncing.” The avatar's outer frame is 28px, the image inside the border is 26px, the click target is 40px, and all four menu icons are 16px. The sign-in controls are centered. The carousel on the right plays automatically by default and uses only pagination dots as visible controls, while retaining keyboard-accessible pause/play controls and support for reduced motion. Local browser verification confirmed that moving from the vision page to the workspace adds no `/api/me` request, while a manual refresh adds one. Online verification also confirmed that client-side navigation does not reread the account state.
 
-[主站说明](apps/web/README.md)覆盖本地配置、共享会话和部署；[设计依据](docs/loom-product-design.md)记录 loom-box 愿景、原版 Logo、Linear 风格参考及当前能力边界。
+The [main site guide](apps/web/README.md) covers local configuration, shared sessions, and deployment. The [design rationale](docs/loom-product-design.md) records the loom-box vision, original logo, Linear-inspired references, and current capability limits.
 
-[Logto 品牌配置](docs/logto-branding.md)记录生产 Free 租户已保存并重载的浅深主色和 Custom CSS，以及此前开发租户的效果与回滚记录。原生 Company logo/Favicon 未上传；加载画面的标识仅为 CSS 装饰，不隐藏 Powered by Logto，也不能消除协议重定向与上游页面。
+The [Logto branding guide](docs/logto-branding.md) records the light and dark primary colors and Custom CSS saved and reloaded in the production Free tenant, along with the earlier development tenant results and rollback record. The native Company logo/Favicon have not been uploaded. The mark on the loading screen is CSS decoration only; it does not hide Powered by Logto or eliminate protocol redirects and upstream pages.
 
-[SEO 与 AI 检索说明](docs/seo-geo.md)记录公开页面的元数据、结构化数据、站点地图和 AI 文本入口，以及私人流程的索引限制与验证方式。
+The [SEO and AI retrieval guide](docs/seo-geo.md) documents public-page metadata, structured data, sitemaps, and text entry points for AI retrieval, along with indexing restrictions and verification methods for private flows.
 
-英文页面为 `/` 产品首页、`/vision` 愿景、`/workspace` 工作区、`/pricing` 方案；中文使用对应 `/zh` 路径。导航与登录、支付返回均不使用 Hash 地址，每个页面都可直接打开和刷新。
+English pages use `/` for the product homepage, `/vision` for the vision, `/workspace` for the workspace, and `/pricing` for plans. Chinese uses the corresponding `/zh` paths. Navigation and sign-in/payment return URLs do not use hash fragments, and every page can be opened directly and refreshed.
 
 ```bash
 mise run dev-web
@@ -146,13 +146,13 @@ mise run web:deploy-dry-run
 mise run web:deploy
 ```
 
-主站由 `loom-web` Worker 承载 www 自定义域，统一登录与购买由 `loom-identity` Worker 提供；两者分别由原 `vite-react-template`、`hotkey-tools-identity` 原地更名。源码位于 `apps/web` 与 `apps/identity`，旧 D1 `hotkey-tools-identity` 保留，生产目标使用独立数据库。主站 Git Builds 的仓库与构建设置见 [Web 部署说明](apps/web/README.md)。部署环境由 login 写入父域随机会话标识，所有 Loom 子域都属于同一会话信任范围；D1 保存加密状态和撤销标记，退出先撤销再删除共享 Cookie。本地使用明确配置的 localhost 地址，不设置正式父域；Cookie 不按端口隔离，两应用需使用同一环境的会话配置和数据库。发布当前支付代码前目标库须顺序完成 `0001`—`0006`，再发布 Identity 与 WWW；Identity 配置 `CREEM_PRODUCT_ID`、`CREEM_PRO_PRODUCT_ID` 及支付密钥，两应用均仅接受 `CREEM_MODE=test`。14 天内清除 Cookie、主动退出、上游失效或安全异常仍可能要求重登。
+The `loom-web` Worker serves the main site's www custom domain, and `loom-identity` provides centralized sign-in and purchases. They were renamed in place from `vite-react-template` and `hotkey-tools-identity`, respectively. Source code lives in `apps/web` and `apps/identity`. The old `hotkey-tools-identity` D1 database is retained, while production uses a separate database. See the [web deployment guide](apps/web/README.md) for the main site's Git Builds repository and build settings. In deployed environments, login sets a random session identifier on the parent domain; all Loom subdomains are within the same session trust boundary. D1 stores encrypted state and revocation markers. Sign-out revokes the session before deleting the shared cookie. Local development uses explicitly configured localhost URLs without the production parent domain. Cookies are not isolated by port, so both applications must use the same environment's session configuration and database. Before deploying the current payment code, apply `0001`–`0006` to the target database in order, then deploy Identity and WWW. Identity requires `CREEM_PRODUCT_ID`, `CREEM_PRO_PRODUCT_ID`, and payment secrets; both applications accept only `CREEM_MODE=test`. Clearing cookies, signing out, upstream invalidation, or a security anomaly may still require signing in again within the 14-day period.
 
-工作区当前提供人工整理的静态工作计划，不调用模型、创建文件或执行外部工具。产品界面使用工作计划、账号和访问权限等正式措辞，不以界面文案虚构生成或执行能力。用户到 checkout 通过 Creem Test mode 进行 USD 1.00 单次测试付款后，可返回工作区手动刷新权益并打开计划；购买位置清楚标注测试支付、不真实扣款。每次受保护操作均重新查询本用户的有效 Pro 来源订单，全额退款只撤回对应订单权限。
+The workspace currently provides manually curated, static work plans. It does not call models, create files, or execute external tools. The product interface uses terms such as work plans, accounts, and access permissions without claiming generation or execution capabilities it does not have. After a one-time USD 1.00 test payment through Creem Test mode on checkout, users can return to the workspace, manually refresh their entitlements, and open a plan. The purchase interface clearly labels the payment as a test with no real charge. Every protected operation rechecks the current user's valid orders that grant Pro access, and a full refund revokes only the entitlement from the corresponding order.
 
 ## Python workspace
 
-根 `pyproject.toml` 不声明应用 package。uv workspace 包含 `apps/python` 与 `packages/python/*`，共用根 `uv.lock` 和 `.venv`；应用通过 `workspace = true` 引用 `hotkey-tools-core`。成员自行声明运行依赖和构建后端，开发工具集中在根依赖组。
+The root `pyproject.toml` does not declare an application package. The uv workspace includes `apps/python` and `packages/python/*`, sharing the root `uv.lock` and `.venv`. The application references `hotkey-tools-core` through `workspace = true`. Each member declares its own runtime dependencies and build backend; development tools are centralized in root dependency groups.
 
 ```bash
 mise run python-sync
@@ -161,4 +161,4 @@ mise exec -- uv tree --locked --depth 1
 mise exec -- uv run --locked --all-packages pytest
 ```
 
-`uv run --package` 选择依赖环境，不改变工作目录。Wrangler 的 Python 命令须在应用目录执行，因此优先使用对应 mise 入口。Python Worker 的 `pylock.toml`、`.venv-workers` 服务于 Pyodide/WASM，不替代根开发锁；启动或部署前会同步发布依赖并打包共享库源码。参考 [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/)和 [Python Workers FastAPI](https://developers.cloudflare.com/workers/languages/python/packages/fastapi/)。
+`uv run --package` selects the dependency environment without changing the working directory. Wrangler's Python commands must run from the application directory, so prefer the corresponding mise tasks. The Python Worker's `pylock.toml` and `.venv-workers` target Pyodide/WASM and do not replace the root development lockfile. Before startup or deployment, deployment dependencies are synchronized and the shared library's source is bundled. See [uv workspaces](https://docs.astral.sh/uv/concepts/projects/workspaces/) and [Python Workers with FastAPI](https://developers.cloudflare.com/workers/languages/python/packages/fastapi/).

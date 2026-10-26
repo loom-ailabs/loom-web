@@ -6,12 +6,20 @@ describe("server-only legal content loading", () => {
     "loads complete %s notices without serializing them into every client dictionary",
     async (locale) => {
       const legal = await getLegalMessages(locale);
-      expect(legal.privacy.sections).toHaveLength(7);
+      expect(legal.privacy.sections.map((section) => section.id)).toEqual(
+        expect.arrayContaining(["sign_in", "cookies", "analytics", "choices"]),
+      );
+      const analytics = legal.privacy.sections.find((section) => section.id === "analytics");
+      expect(analytics).toMatchObject({
+        title: expect.any(String),
+        paragraphs: expect.arrayContaining([expect.stringContaining("Google Analytics 4")]),
+      });
       expect(legal.terms.sections).toHaveLength(6);
       expect(legal.privacy.lead).toContain("boylucky2012@gmail.com");
       const client = JSON.stringify(await getMessagesForLocale(locale));
       expect(client).not.toContain(legal.privacy.lead);
       expect(client).not.toContain(legal.terms.lead);
+      expect(client).not.toContain(analytics!.paragraphs[0]);
     },
   );
 });

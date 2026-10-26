@@ -18,6 +18,16 @@ The interface shares light, dark, system appearance, and language preferences. T
 
 `/api/auth/login`, callbacks, orders, Creem webhooks, and historical Stripe webhooks have no language prefix. A valid language preference affects only the hosted sign-in interface through the official SDK's fixed `ui_locales=zh-CN|en` values; it does not change authentication or return-URL validation. See the [internationalization guide](../../docs/internationalization.md) for message and layout integration. The main site's avatar menu and profile page belong to `apps/web`.
 
+## Visitor Analytics
+
+GA4 dashboards: [Overview](https://analytics.google.com/analytics/web/#/a413424914p560689577/reports/intelligenthome) and [Realtime](https://analytics.google.com/analytics/web/#/a413424914p560689577/realtime/overview). The configured account is `413424914`, property `560689577`, web stream `16206196176`, and measurement ID `G-DNW94H7H8N`.
+
+Identity and WWW share the GA4 implementation in `packages/analytics` and the same runtime `GA_MEASUREMENT_ID`. Analytics loads only after opt-in on an exact production Loom HTTPS host. Only the root and `/headshots` landing pages, including their Chinese equivalents, are measured; profile, receipt, callback, and API paths are excluded. Measurement sends sanitized page paths and referrer origins without account, order, payment, or sign-in data.
+
+Analytics settings and browser test exclusion are shared with WWW through separate 180-day preference cookies. Open a public page with `?analytics_test=1` to exclude this browser, or `?analytics_test=0` to remove that exclusion. These preferences do not affect shared authentication. Local and Workers previews do not collect analytics. Keep enhanced measurement disabled in GA4 because the application sends manual page views. See [WWW visitor analytics](../web/README.md#visitor-analytics) for collection boundaries, consent controls, and metric definitions.
+
+On 2026-10-26, deployment readback confirmed Identity version `909007d9-8b13-43d3-bded-7f0ecf1c3049` served 100% of traffic. The full `mise run verify` passed, including 17 analytics tests. Actual browser validation confirmed checkout `/headshots` returned a successful GA collection response (204) using the same browser identifier as WWW. Realtime displayed one controlled test visitor; this is collection acceptance evidence, not organic visitor growth. See the WWW analytics record for consent, route-transition, and profile-exclusion checks.
+
 ## Local Development
 
 Initialize the application from the repository root:
@@ -74,6 +84,7 @@ Environment files:
 | `STRIPE_SECRET_KEY`     | Key for historical Stripe order and refund queries; must match the original mode, Price, Session, and events; not used for new purchases                                                                                | `.dev.vars` only; remote Worker Secret             |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_` signing secret for the retained historical Stripe endpoint; CLI forwarding and the remote endpoint use different secrets                                                                                       | `.dev.vars` only; remote Worker Secret             |
 | `STRIPE_PRICE_ID`       | Retained fixed, one-time Stripe Price configuration for historical orders; does not change existing order amounts or ownership                                                                                          | Local environment files; remote Worker Variable    |
+| `GA_MEASUREMENT_ID`     | Optional GA4 web-stream measurement ID (`G-…`), shared with WWW; unset disables analytics and collection requires visitor consent                                                                                       | Remote Worker Variable                             |
 | `DB`                    | D1 binding, not a connection string                                                                                                                                                                                     | `d1_databases` in `wrangler.jsonc`                 |
 
 Generate a cookie secret with `openssl rand -base64 32`, then save it in a local file or Secret. Do not commit actual credentials, put them in `NEXT_PUBLIC_*`, or expose secrets in command-line arguments, pages, screenshots, or logs. The root `.env` does not replace application configuration.

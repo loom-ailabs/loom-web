@@ -11,6 +11,7 @@
   ],
   "vars": {
     "APP_URL": "https://checkout.loom-labs.ai",
+    "GA_MEASUREMENT_ID": "G-DNW94H7H8N",
     "LOGIN_URL": "https://login.loom-labs.ai",
     "AUTH_SUCCESS_URL": "https://www.loom-labs.ai/",
     "LOGTO_ENDPOINT": "https://5z8hdi.logto.app",

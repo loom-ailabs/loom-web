@@ -11,5 +11,20 @@
   "privacy": "隐私说明",
   "terms": "使用规则",
   "legalLinks": "隐私与使用规则",
-  "settings": "偏好设置"
+  "settings": "偏好设置",
+  "analytics": {
+    "title": "帮助我们改进 Loom",
+    "description": "经你允许，Google Analytics 会帮助我们统计访客数量，了解公共页面的使用情况。在你允许前，可选访问统计保持关闭。",
+    "accept": "允许访问统计",
+    "reject": "拒绝",
+    "settings": "访问统计设置",
+    "settingsTitle": "访问统计偏好",
+    "settingsDescription": "选择是否允许此浏览器发送可选访问统计。更改此设置不会影响登录或购买。",
+    "excludeBrowser": "不统计此浏览器的访问",
+    "excludeBrowserDescription": "适用于你自己的浏览和测试。此浏览器访问 Loom 各子域时会共用这一设置。",
+    "save": "保存偏好",
+    "cancel": "取消",
+    "privacy": "隐私说明",
+    "consentLabel": "允许可选访问统计"
+  }
 }

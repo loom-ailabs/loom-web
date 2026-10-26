@@ -33,7 +33,8 @@
         "title": "Cookies and shared sign-in",
         "paragraphs": [
           "The sign-in cookie contains a random session identifier, rather than your profile or tokens. It is Secure, HttpOnly, and SameSite=Lax on HTTPS and is sent to subdomains of .loom-labs.ai for shared sign-in. Those subdomains are part of the same session trust boundary.",
-          "A session has an absolute limit of 14 days from successful sign-in. Signing out, revocation, provider failure, or a security check can end access earlier. Temporary sign-in flow cookies last up to 10 minutes. Language and appearance preference cookies can last one year; they contain preference values, not identity or purchase rights."
+          "A session has an absolute limit of 14 days from successful sign-in. Signing out, revocation, provider failure, or a security check can end access earlier. Temporary sign-in flow cookies last up to 10 minutes. Language and appearance preference cookies can last one year; they contain preference values, not identity or purchase rights.",
+          "If you allow optional analytics, Google Analytics uses _ga cookies to distinguish browsers and sessions for up to 180 days; our configuration does not renew that expiry on each visit. Separate LOOM_ANALYTICS_CONSENT and LOOM_ANALYTICS_TEST cookies remember your analytics choice and any browser test exclusion for up to 180 days across .loom-labs.ai. These preferences do not contain your identity or purchase rights. Clearing browser cookies can reset these choices."
         ]
       },
       {
@@ -49,7 +50,16 @@
         "id": "operations",
         "title": "Operational information",
         "paragraphs": [
-          "Loom and its infrastructure providers may process request, error, and security-related technical information to operate and protect the service. This notice does not claim that no logs exist. The current site does not add advertising, marketing, or behavioral analytics trackers."
+          "Loom and its infrastructure providers may process request, error, and security-related technical information to operate and protect the service. These operational records are separate from the optional website analytics described below."
+        ]
+      },
+      {
+        "id": "analytics",
+        "title": "Optional website analytics",
+        "paragraphs": [
+          "If you allow optional analytics, Loom uses Google Analytics 4 on its public pages to estimate visitor counts and understand page usage. Google receives page paths and hostnames, the referring site's origin, event times, browser and device information, and a pseudonymous browser identifier. Technical information such as your IP address can reach Google when your browser sends these requests. Visitor counts are estimates rather than an exact count of people.",
+          "Loom does not load Google Analytics before you opt in. Our implementation removes query strings and fragments from page URLs and sends only the origin of a referring site. It does not send your Loom account identifier, name, email address, sign-in tokens, order details, or payment data to Google Analytics. Profile, receipt, callback, and API routes are excluded. Google signals and advertising personalization are disabled.",
+          "Google processes this information as the analytics service provider. Analytics data is retained according to the Google Analytics property settings. Use Analytics settings on a public page to change your choice or exclude this browser from your own tests. Withdrawing permission stops future analytics from this browser and clears its Google Analytics cookies; it does not erase information already collected. Declining analytics does not affect sign-in or purchases."
         ]
       },
       {

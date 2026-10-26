@@ -18,6 +18,7 @@
     "db:migrate:preview": "wrangler d1 migrations apply DB --local --env preview"
   },
   "dependencies": {
+    "@hotkey-tools/analytics": "workspace:*",
     "@hotkey-tools/i18n": "workspace:*",
     "@hotkey-tools/identity-core": "workspace:*",
     "@hotkey-tools/ui": "workspace:*",

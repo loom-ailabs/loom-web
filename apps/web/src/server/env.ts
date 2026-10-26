@@ -5,6 +5,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 export type WebEnv = {
   DB?: D1Database;
   APP_URL?: string;
+  GA_MEASUREMENT_ID?: string;
   LOGIN_URL?: string;
   AUTH_SUCCESS_URL?: string;
   LOGTO_ENDPOINT?: string;
@@ -23,6 +24,7 @@ declare global {
 
 const variableNames = [
   "APP_URL",
+  "GA_MEASUREMENT_ID",
   "LOGIN_URL",
   "AUTH_SUCCESS_URL",
   "LOGTO_ENDPOINT",

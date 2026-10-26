@@ -10,7 +10,12 @@ const joseWebCrypto = join(dirname(require.resolve("jose/package.json")), "dist/
 initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@hotkey-tools/ui", "@hotkey-tools/identity-core", "@hotkey-tools/i18n"],
+  transpilePackages: [
+    "@hotkey-tools/ui",
+    "@hotkey-tools/identity-core",
+    "@hotkey-tools/i18n",
+    "@hotkey-tools/analytics",
+  ],
   images: { unoptimized: true },
   webpack(config) {
     // Next's Node build otherwise selects jose's Node export before OpenNext can

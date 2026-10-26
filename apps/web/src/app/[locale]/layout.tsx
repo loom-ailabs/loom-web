@@ -1,11 +1,14 @@
 import { getBillingPresentationMode } from "@/server/billing-presentation";
+import { getEnv } from "@/server/env";
+import { SiteAnalytics } from "@hotkey-tools/analytics";
+import { getAnalyticsConfiguration } from "@hotkey-tools/analytics/server";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { AppearanceProvider } from "@hotkey-tools/ui";
 import { getMessagesForLocale } from "@hotkey-tools/i18n/server";
-import { isLocale, languageTag } from "@hotkey-tools/i18n/routing";
+import { isLocale, languageTag, localizePath } from "@hotkey-tools/i18n/routing";
 import {
   createPageMetadata,
   SITE_NAME,
@@ -43,6 +46,8 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const billingMode = await getBillingPresentationMode();
+  const messages = await getMessagesForLocale(locale, billingMode);
+  const analytics = getAnalyticsConfiguration(await getEnv(), "web");
   const theme = (await cookies()).get("LOOM_THEME")?.value;
   const initialTheme =
     theme === "light" || theme === "dark" || theme === "system" ? theme : undefined;
@@ -64,13 +69,14 @@ export default async function LocaleLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(createSiteStructuredData(locale)) }}
         />
-        <NextIntlClientProvider
-          locale={locale}
-          messages={await getMessagesForLocale(locale, billingMode)}
-          timeZone="UTC"
-        >
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
           <AppearanceProvider initialTheme={initialTheme}>
             <ProductAccessProvider>{children}</ProductAccessProvider>
+            <SiteAnalytics
+              configuration={analytics}
+              copy={messages.Common.analytics}
+              privacyHref={localizePath("/privacy", locale)}
+            />
           </AppearanceProvider>
         </NextIntlClientProvider>
       </body>

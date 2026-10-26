@@ -11,5 +11,20 @@
   "privacy": "Privacy Policy",
   "terms": "Terms of Use",
   "legalLinks": "Privacy and terms",
-  "settings": "Preferences"
+  "settings": "Preferences",
+  "analytics": {
+    "title": "Help us improve Loom",
+    "description": "With your permission, Google Analytics helps us count visitors and understand how our public pages are used. Optional analytics stays off until you allow it.",
+    "accept": "Allow analytics",
+    "reject": "Decline",
+    "settings": "Analytics settings",
+    "settingsTitle": "Analytics preferences",
+    "settingsDescription": "Choose whether this browser sends optional analytics. Changing this setting does not affect sign-in or purchases.",
+    "excludeBrowser": "Exclude this browser from analytics",
+    "excludeBrowserDescription": "Use this for your own browsing and tests. This preference is shared across Loom subdomains on this browser.",
+    "save": "Save preferences",
+    "cancel": "Cancel",
+    "privacy": "Privacy Policy",
+    "consentLabel": "Allow optional analytics"
+  }
 }

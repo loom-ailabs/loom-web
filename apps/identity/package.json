@@ -23,6 +23,7 @@
     "db:migrate": "node scripts/check-cloudflare.mjs && wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
+    "@hotkey-tools/analytics": "workspace:*",
     "@hotkey-tools/i18n": "workspace:*",
     "@hotkey-tools/identity-core": "workspace:*",
     "@hotkey-tools/ui": "workspace:*",

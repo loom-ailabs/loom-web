@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
-const runtime = vi.hoisted(() => ({ mode: "test" as StripeMode }));
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
+const runtime = vi.hoisted(() => ({ mode: "test" as PaymentMode }));
 vi.mock("@/server/billing-presentation", () => ({
   getBillingPresentationMode: async () => runtime.mode,
 }));
@@ -173,7 +173,8 @@ describe("public search and agent discovery", () => {
 
   it("reads runtime mode for each root text request rather than freezing a build-time payment claim", async () => {
     const test = await (await getLlmsFullText()).text();
-    expect(test).toContain("Stripe Sandbox");
+    expect(test).toContain("Creem Test mode");
+    expect(test).not.toContain("Stripe");
     runtime.mode = "live";
     const live = await (await getLlmsFullText()).text();
     expect(live).toContain("USD 1.00");

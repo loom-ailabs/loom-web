@@ -6,7 +6,7 @@ function keys(value: unknown, path = ""): string[] {
     : [path];
 }
 it("keeps the two complete message catalogs aligned for every consumer", () => {
-  for (const name of ["common", "web", "sign-in", "access", "seo"]) {
+  for (const name of ["common", "web", "sign-in", "access", "headshots", "seo"]) {
     const zh = JSON.parse(
       readFileSync(new URL(`../messages/zh/${name}.json`, import.meta.url), "utf8"),
     );

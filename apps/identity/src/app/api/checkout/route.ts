@@ -1,5 +1,5 @@
 import { getUser } from "@/server/auth";
-import { createCheckout } from "@/server/billing";
+import { createPurchaseCheckout } from "@/server/purchases";
 import { getEnv } from "@/server/env";
 import { ApiError, jsonError, jsonSuccess, requireSameOrigin } from "@/server/http";
 
@@ -23,7 +23,11 @@ export async function POST(request: Request) {
     ) {
       throw new ApiError(400, "invalid_request_id", "请提供用于重试去重的 requestId。");
     }
-    return jsonSuccess(await createCheckout(user, body.requestId));
+    const locale = "locale" in body ? body.locale : "en";
+    if (locale !== "en" && locale !== "zh") {
+      throw new ApiError(400, "invalid_json", "locale 必须为 en 或 zh。");
+    }
+    return jsonSuccess(await createPurchaseCheckout(user, body.requestId, locale));
   } catch (error) {
     return jsonError(error);
   }

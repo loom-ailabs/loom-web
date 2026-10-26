@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "@hotkey-tools/i18n";
+import { localizePath, useLocale, useTranslations } from "@hotkey-tools/i18n";
 import { ApiRequestError } from "@/shared/api";
 import { createCheckout, fetchOrder, fetchPremium, fetchProfile } from "../api/access-api";
 import type { Profile } from "./types";
@@ -33,6 +33,7 @@ type FallbackKey = "profile" | "order" | "refresh" | "purchase" | "premium";
 
 export function useManageAccess() {
   const t = useTranslations("Access");
+  const locale = useLocale();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,7 +42,13 @@ export function useManageAccess() {
   const [failure, setFailure] = useState<Error | null>(null);
   const [featureResult, setFeatureResult] = useState("");
   const [pollVersion, setPollVersion] = useState(0);
+  const [loginUrl, setLoginUrl] = useState("/api/auth/login?destination=checkout");
   const requestId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const target = new URL(localizePath("/", locale), window.location.origin);
+    setLoginUrl(`/api/auth/login?returnTo=${encodeURIComponent(target.toString())}`);
+  }, [locale]);
 
   const asError = useCallback(
     (error: unknown, fallback: FallbackKey) => {
@@ -86,7 +93,9 @@ export function useManageAccess() {
       setNotice(t("notices.cancelled"));
       return;
     }
-    const orderId = params.get("order_id");
+    // Creem adds its own order_id; purchase_id always refers to the local order.
+    // Historical Stripe returns used order_id for that same local identifier.
+    const orderId = params.get("purchase_id") ?? params.get("order_id");
     if (params.get("checkout") !== "success" || !orderId) return;
 
     const controller = new AbortController();
@@ -139,14 +148,14 @@ export function useManageAccess() {
 
   const purchase = async () => {
     if (!profile?.user) {
-      window.location.assign("/api/auth/login?destination=checkout");
+      window.location.assign(loginUrl);
       return;
     }
     setAction("purchase");
     setFailure(null);
     requestId.current ??= crypto.randomUUID();
     try {
-      const result = await createCheckout(requestId.current);
+      const result = await createCheckout(requestId.current, locale);
       if (result.status === "paid") {
         await reloadProfile();
         setNotice(t("notices.alreadyPaid"));
@@ -197,6 +206,7 @@ export function useManageAccess() {
     featureResult,
     configurationMissing,
     premium: profile?.entitlements.premium ?? false,
+    loginUrl,
     purchase,
     usePremium,
     refresh,

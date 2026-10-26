@@ -20,6 +20,7 @@
     "LOGTO_COOKIE_DOMAIN": ".loom-labs.ai",
     "LOGTO_APP_ID": "qc6kvqsqa3k4ti63rmom7",
     "STRIPE_MODE": "test",
+    "CREEM_MODE": "test",
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -45,6 +46,7 @@
         "LOGTO_USER_NAMESPACE": "https://kpy72v.logto.app",
         "LOGTO_APP_ID": "7wqbzelu2ey5n5brfr73d",
         "STRIPE_MODE": "test",
+        "CREEM_MODE": "test",
       },
       "d1_databases": [
         {

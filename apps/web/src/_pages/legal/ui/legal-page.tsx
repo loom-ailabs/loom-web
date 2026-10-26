@@ -35,7 +35,7 @@ export async function LegalPage({ kind, locale }: { kind: "privacy" | "terms"; l
             {content.title}
           </h1>
           <p className="mt-4 text-xs text-muted-foreground">
-            {labels.updated}: <time dateTime="2026-10-23">{labels.date}</time>
+            {labels.updated}: <time dateTime="2026-10-26">{labels.date}</time>
           </p>
           <p className="mt-6 text-base leading-8 text-muted-foreground">{content.lead}</p>
           <div className="mt-10 space-y-10">

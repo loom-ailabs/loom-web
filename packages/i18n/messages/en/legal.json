@@ -6,11 +6,11 @@
     "terms": "Terms of Use",
     "contact": "Contact",
     "updated": "Last updated",
-    "date": "October 23, 2026"
+    "date": "October 26, 2026"
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lead": "This notice explains how the Loom AI website, sign-in service, and Sandbox checkout handle information. Loom AI is the product brand used on this site. For privacy questions or account requests, contact boylucky2012@gmail.com.",
+    "lead": "This notice explains how the Loom AI website, sign-in service, and test checkout handle information. Loom AI is the product brand used on this site. For privacy questions or account requests, contact boylucky2012@gmail.com.",
     "sections": [
       {
         "id": "sign_in",
@@ -25,7 +25,7 @@
         "title": "Service providers and stored records",
         "paragraphs": [
           "Logto processes the sign-in identity and authorization flow. Cloudflare hosts the applications and D1 database. D1 stores account identifiers, names and email addresses when supplied, encrypted session-token state, and order and access records. The application does not store session tokens in browser cookies.",
-          "For Sandbox checkout, Loom sends Stripe the order and account identifiers, product information, amount, and currency. Stripe hosts the test checkout and processes the information entered there. These service providers process information needed to provide their respective services."
+          "For current test checkouts, Loom sends Creem the order and account identifiers, product information, amount, and currency. Creem hosts checkout in Test mode and processes the information entered there. Historical Stripe Sandbox orders and webhook records are retained for reconciliation, refunds, and access-revocation handling. These providers process information needed to provide their respective services."
         ]
       },
       {
@@ -38,10 +38,11 @@
       },
       {
         "id": "payments",
-        "title": "Sandbox payments and current product scope",
+        "title": "Test payments and current product scope",
         "paragraphs": [
-          "Payments are currently in Stripe Sandbox and do not charge real money. Use Stripe test payment details. Sandbox order and access records support testing and are separate from live payments.",
-          "The available work plan is curated, static reading and planning content. It does not call a model, create files, or perform external actions on your behalf."
+          "Payments currently use Creem Test mode and do not charge real money. Use Creem test payment details. Test order and access records support testing and are separate from live payments.",
+          "The available work plan is curated, static reading and planning content. It does not call a model, create files, or perform external actions on your behalf.",
+          "Professional Headshot Pack purchases currently record test package entitlements only. Photo upload, generation, and downloads are not available yet."
         ]
       },
       {
@@ -70,14 +71,15 @@
   },
   "terms": {
     "title": "Terms of Use",
-    "lead": "These rules describe the current scope of the Loom AI website, shared sign-in, and Sandbox access flow. Questions can be sent to boylucky2012@gmail.com.",
+    "lead": "These rules describe the current scope of the Loom AI website, shared sign-in, and test purchase flow. Questions can be sent to boylucky2012@gmail.com.",
     "sections": [
       {
         "id": "scope",
         "title": "What the service currently provides",
         "paragraphs": [
           "Loom presents its product vision, a workspace introduction, and a curated creative-tool work plan. The work plan is static content for reading and planning. It does not generate model output, create files, or execute tasks in other tools.",
-          "Statements about connecting desktop, browser, and editor workflows describe the product vision. They do not mean that every integration or automated capability is currently available."
+          "Statements about connecting desktop, browser, and editor workflows describe the product vision. They do not mean that every integration or automated capability is currently available.",
+          "The Professional Headshot Pack is a separate package from Loom Pro. Current testing records payment and entitlements for four portraits and one redo; it does not upload photos, generate portraits, or deliver files."
         ]
       },
       {
@@ -90,10 +92,10 @@
       },
       {
         "id": "sandbox",
-        "title": "Sandbox access is a test flow",
+        "title": "Test payments and access",
         "paragraphs": [
-          "Checkout currently uses Stripe Sandbox. The displayed USD 1.00 amount is a test amount and makes no real charge. Use Stripe test payment details. Access is granted only after server-side payment confirmation, not merely by visiting a success page.",
-          "Sandbox records do not represent a real purchase or a promise of access to future commercial offerings. Test payment, refund, and revocation operations can change test access. These rules do not establish a live purchase or refund policy."
+          "Checkout currently uses Creem Test mode. The displayed USD 1.00 amount for Loom Pro and USD 9.99 amount for the separate Professional Headshot Pack are test amounts and make no real charge. Use Creem test payment details. Access or package entitlements are granted only after server-side payment confirmation, not merely by visiting a success page.",
+          "Test records do not represent a real purchase or a promise of access to future commercial offerings. Test payment, refund, and revocation operations can change test access. These rules do not establish a live purchase or refund policy."
         ]
       },
       {
@@ -108,7 +110,7 @@
         "id": "providers",
         "title": "External providers and privacy",
         "paragraphs": [
-          "Sign-in and checkout can take you to Google, GitHub, Logto, or Stripe pages. These providers operate their own account and service features. Loom does not manage your provider password or replace your control of those accounts.",
+          "Sign-in and checkout can take you to Google, GitHub, Logto, or Creem pages. These providers operate their own account and service features. Loom does not manage your provider password or replace your control of those accounts.",
           "Read the Privacy Policy for information about account data, cookies, service providers, and deletion requests. For account or service questions, contact boylucky2012@gmail.com."
         ]
       },
@@ -116,7 +118,7 @@
         "id": "changes",
         "title": "Service changes",
         "paragraphs": [
-          "The scope and availability of the service can change. Any move from Sandbox testing to real payments requires the relevant purchase information and user-facing notices to be updated before the new flow is offered. This page describes the current test flow."
+          "The scope and availability of the service can change. Any move from test payments to real payments requires the relevant purchase information and user-facing notices to be updated before the new flow is offered. This page describes the current test flow."
         ]
       }
     ]

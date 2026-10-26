@@ -1,1 +1,2 @@
-export type StripeMode = "test" | "live";
+export type PaymentMode = "test" | "live";
+export type StripeMode = PaymentMode;

@@ -1,7 +1,7 @@
 "use client";
 
 import { localizeUrl } from "@hotkey-tools/i18n/routing";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 
 import Image from "next/image";
 import { Button, GlassSurface } from "@hotkey-tools/ui";
@@ -55,7 +55,7 @@ export function HomePage({
   billingMode,
 }: {
   view?: ProductView;
-  billingMode: StripeMode;
+  billingMode: PaymentMode;
 }) {
   const t = useTranslations("Web");
   const locale = useLocale();

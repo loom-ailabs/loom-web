@@ -1,7 +1,7 @@
 "use client";
 
 import { localizeUrl } from "@hotkey-tools/i18n/routing";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 
 import { useLocale, useTranslations } from "@hotkey-tools/i18n";
 import { Button, GlassSurface, cn } from "@hotkey-tools/ui";
@@ -24,7 +24,7 @@ export function ProductWorkspace({
   billingMode,
 }: {
   access: Access;
-  billingMode: StripeMode;
+  billingMode: PaymentMode;
 }) {
   const t = useTranslations("Web");
   const locale = useLocale();

@@ -102,12 +102,12 @@
   "errorBusy": "Your account is syncing. Please try again shortly.",
   "billing": {
     "test": {
-      "notice": "Test payments only. You will not be charged real money.",
+      "notice": "Test payments only. Creem Test mode does not charge real money.",
       "label": "USD · one-time test payment",
-      "mode": "Test payment"
+      "mode": "Creem Test mode"
     },
     "live": {
-      "notice": "One-time USD 1.00 purchase. Secure checkout hosted by Stripe, with no subscription or automatic renewal.",
+      "notice": "One-time USD 1.00 purchase. Secure checkout hosted by Creem, with no subscription or automatic renewal.",
       "label": "USD · one-time purchase",
       "mode": "One-time purchase"
     }

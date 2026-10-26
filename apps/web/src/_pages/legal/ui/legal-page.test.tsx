@@ -31,7 +31,7 @@ describe("public legal notices", () => {
       );
       const page = new DOMParser().parseFromString(markup, "text/html");
       expect(page.querySelector("h1")?.textContent).toBe(legal[kind].title);
-      expect(page.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-23");
+      expect(page.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-26");
       expect(page.querySelectorAll("article h2")).toHaveLength(legal[kind].sections.length);
       expect(page.querySelector("article")?.textContent).toContain(legal[kind].lead);
       for (const section of legal[kind].sections) {
@@ -64,7 +64,10 @@ describe("public legal notices", () => {
     expect(privacy).toContain("do not charge real money");
     const terms = en.terms.sections.flatMap((section) => section.paragraphs).join("\n");
     expect(terms).toContain("does not generate model output");
-    expect(terms).toContain("USD 1.00 amount is a test amount");
+    expect(terms).toContain("USD 1.00 amount for Loom Pro");
+    expect(terms).toContain("USD 9.99 amount for the separate Professional Headshot Pack");
+    expect(terms).toContain("Creem Test mode");
+    expect(privacy).toContain("Historical Stripe Sandbox orders");
     expect(terms).toContain("do not establish a live purchase or refund policy");
   });
 });

@@ -24,15 +24,16 @@ describe("server-rendered checkout billing copy", () => {
           </NextIntlClientProvider>,
         );
         if (mode === "test") {
-          expect(markup).toContain("Sandbox");
+          expect(markup).toMatch(/Creem Test mode|Creem 测试模式/);
           expect(markup).toMatch(/No real charge|不会真实扣款/);
         } else {
           expect(markup).toContain("USD 1.00");
-          expect(markup).toContain("Stripe");
+          expect(markup).toContain("Creem");
           expect(markup).not.toMatch(
             /Sandbox|Test payment|test payment|No real charge|不会真实扣款|测试支付/,
           );
         }
+        expect(markup).not.toContain("Stripe");
         const legalPrefix = `https://www.loom-labs.ai${locale === "zh" ? "/zh" : ""}`;
         expect(markup).toContain(`href="${legalPrefix}/privacy"`);
         expect(markup).toContain(`href="${legalPrefix}/terms"`);

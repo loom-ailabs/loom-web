@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseStripeMode } from "./billing-mode";
+import { parseCreemMode, parseStripeMode } from "./billing-mode";
 
 describe("explicit Stripe mode", () => {
   it("keeps an unconfigured existing deployment in test mode", () => {
@@ -15,6 +15,22 @@ describe("explicit Stripe mode", () => {
     (value) => {
       expect(() => parseStripeMode(value)).toThrow(
         expect.objectContaining({ status: 503, code: "invalid_billing_mode" }),
+      );
+    },
+  );
+});
+
+describe("current Creem mode", () => {
+  it("defaults only an absent value to test", () => {
+    expect(parseCreemMode()).toBe("test");
+    expect(parseCreemMode("test")).toBe("test");
+  });
+
+  it.each(["", " ", "live", "prod", "TEST", "test ", "\ttest"])(
+    "refuses unsupported mode %j",
+    (value) => {
+      expect(() => parseCreemMode(value)).toThrow(
+        expect.objectContaining({ status: 503, code: "sandbox_required" }),
       );
     },
   );

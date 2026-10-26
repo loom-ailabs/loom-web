@@ -4,17 +4,17 @@
 
 登录统一由 `login.loom-labs.ai` 发起，使用 `LOGTO_ENDPOINT` 指定的 Logto。WWW、checkout、login 在同一环境内使用同一 D1、app ID、endpoint、会话密钥与固定租户命名空间。生产 Cookie `__Secure-loom_sid_<appId>` 只保存随机会话标识，设置 `Domain=.loom-labs.ai; Path=/; HttpOnly; Secure; SameSite=Lax`；SDK 令牌状态加密保存在 D1。10 分钟登录流程使用相同属性的 `__Secure-loom_flow_<appId>`。
 
-Logto 生产 Free 身份与独立 D1 已发布，真实联调进行中；对象、实际版本和验收状态统一见[生产切换说明](../../docs/production-cutover.md)。本次继续 `STRIPE_MODE=test`，Live 关闭；未来 USD 1.00 单次正式购买只完成代码准备。
+两 Worker 使用 Logto 生产 Free 身份与独立 D1。全站新购买统一使用 Creem Test mode：Loom Pro 为 USD 1.00，职业形象照包为独立的 USD 9.99 商品；均不会真实扣款。当前配置与分阶段验收见 [Creem 接入说明](../../docs/creem-test-integration.md)，原身份切换与 Stripe 阶段的历史记录见[生产切换说明](../../docs/production-cutover.md)。
 
 会话从成功回调起最多保留 14 天，刷新短期令牌不会延长该截止时间。服务端按需通过官方 SDK 自动刷新，并重新检查身份，页面和 RSC 不需要重写 Cookie。刷新结果不确定或租约过期时拒绝继续使用；清除 Cookie、退出或上游失效也可能在 14 天前要求登录。旧自包含父域 Cookie 和 `logto_<appId>` 主机 Cookie 不再接受，已有用户需一次重新登录；详见[会话生命周期](../../docs/session-lifecycle.md)。
 
 产品登录带完整 `returnTo` 路径和 query；已有有效会话时中央入口直接返回产品，匿名用户选择 Google/GitHub。只接受 HTTPS 的规范 `*.loom-labs.ai`，排除 login/auth、用户信息、非标准端口与 hash。无显式目标时，同产品 Referer 可保留初始未水合链接的路径；其他来源使用固定 `/workspace`。
 
-共享实现位于 `packages/identity-core`，通过官方 Node/edge SDK 处理 OIDC 与刷新，Next cookies 只读写随机标识；D1 是可撤销会话的权威存储。WWW 不加载 Stripe SDK 或密钥，只读取经校验的 `STRIPE_MODE`。购买仍在 checkout，回到 WWW 后查询同一环境的 D1 权益：来源订单必须已付款、模式匹配且归属一致；test 接受 payload 版本 1/2，live 只接受 2，测试 grant 不能解锁正式权益。页面、SEO 和 AI 文本说明同样按服务端模式选择，不能在 live 文案中保留不真实扣款的承诺。
+共享实现位于 `packages/identity-core`，通过官方 Node/edge SDK 处理 OIDC 与刷新，Next cookies 只读写随机标识；D1 是可撤销会话的权威存储。WWW 不加载支付 SDK 或密钥，当前展示和鉴权读取经校验的 `CREEM_MODE=test`。购买在 checkout 通过 Creem 完成，回到 WWW 后查询同一 D1：新 Creem Pro 或历史 Stripe Pro 的来源订单必须已付款、模式匹配且归属一致。职业照套餐不授予 Pro。当前页面、SEO 和 AI 文本均明确测试支付，不会真实扣款；旧 Stripe 字段仅保留历史处理。
 
 ## 中英文、外观与个人信息
 
-英文默认使用原四个公开页面路径，中文使用对应 `/zh` 路径，均可直接访问与刷新。旧 `/en` 页面地址保留原始 query 并规范跳转到对应英文根路径。`/account`、`/zh/account` 提供当前用户信息并禁止索引，不进入公开站点地图。头像菜单包含个人信息、浅色/深色/跟随系统、中文/English 与退出；头像外框为 28px（边框内图片 26px）、点击范围为 40px，四项菜单图标均为 16px，不作为身份或付费授权依据。
+英文默认使用原四个公开页面路径，中文使用对应 `/zh` 路径，均可直接访问与刷新。旧 `/en` 页面地址保留原始 query 并规范跳转到对应英文根路径。`/account`、`/zh/account` 提供当前用户信息并禁止索引，不进入公开站点地图。头像菜单包含个人信息、浅色/深色/跟随系统、语言与退出；语言选项按 English、简体中文排序，保留已保存的偏好。头像外框为 28px（边框内图片 26px）、点击范围为 40px，四项菜单图标均为 16px，不作为身份或付费授权依据。
 
 `ProductAccessProvider` 放在布局中，导航和工作区共享同一账号状态，客户端页面切换不会重建读取。首次完整加载读取一次；不因 focus、visibility、定时器或路由变化自动同步，导航也不显示“Syncing”。用户手动刷新状态或完整重载可更新快照；功能操作仍以服务端当前会话与权益为准，导航快照不授予权限。
 
@@ -42,7 +42,7 @@ mise run web:deploy-dry-run
 
 JSON 统一 `{code:0,msg:"success",data}` / `{code:正整数,msg,error:{type}}`，均为 private/no-store 且 noindex。`GET /api/me` 返回 `{user:{id,name?,email?,picture?}|null,entitlements:{premium:boolean}}`。`GET /api/premium` 每次验证会话和 D1：匿名 401、无有效授权 403、有授权 200 `{unlocked:true,message}`。`POST /api/auth/logout` 只接受本产品准确 Origin，先撤销 D1 共享会话，再尽力撤销上游令牌，finally 清 Cookie，最终 303 登出；不因共享 Cookie 而放宽 CORS/CSRF。当前 SID 的复制件在撤销后也失效，刷新或已知关联流程的迟到回调不能使其恢复；不宣称退出其他设备或撤销无关联的独立新授权。
 
-`wrangler.jsonc` 的部署目标为 Worker `loom-web`。2026-10-23 已将既有 `vite-react-template` 原地更名，继续承载 `www.loom-labs.ai`。公开 Variables 包括 APP_URL、LOGIN_URL、AUTH_SUCCESS_URL、LOGTO_ENDPOINT、LOGTO_USER_NAMESPACE、LOGTO_APP_ID、LOGTO_COOKIE_DOMAIN、STRIPE_MODE；Secret 仅 LOGTO_APP_SECRET 和与 identity 相同的 LOGTO_COOKIE_SECRET，不包含 Stripe。后者作为 D1 状态加密的密钥派生输入。同一环境两应用必须绑定同一份数据库；新支付代码发布前先由 identity 在目标库完成 `0001`—`0004`，跨环境不复制会话和测试权益。真正 OIDC 回调只登记中央 `https://login.loom-labs.ai/api/auth/callback`，其他旧回调暂留登记但产品服务拒绝非中央主机回调。
+`wrangler.jsonc` 的部署目标为 Worker `loom-web`。2026-10-23 已将既有 `vite-react-template` 原地更名，继续承载 `www.loom-labs.ai`。公开 Variables 包括 APP_URL、LOGIN_URL、AUTH_SUCCESS_URL、LOGTO_ENDPOINT、LOGTO_USER_NAMESPACE、LOGTO_APP_ID、LOGTO_COOKIE_DOMAIN、CREEM_MODE，以及历史权益查询保留的 STRIPE_MODE；当前 `CREEM_MODE` 仅接受 test，未设置时默认 test，显式空串、空白、live 或其他值拒绝。Secret 仅 LOGTO_APP_SECRET 和与 identity 相同的 LOGTO_COOKIE_SECRET，不包含支付密钥；后者作为 D1 状态加密的密钥派生输入。同一环境两应用必须绑定同一份数据库；当前支付代码发布前先由 identity 在目标库顺序完成 `0001`—`0006`，再发布 Identity 与 WWW，跨环境不复制会话和测试权益。`0006` 保留既有职业照记录并新增独立 Pro 权益，不修改历史 Stripe 订单。真正 OIDC 回调只登记中央 `https://login.loom-labs.ai/api/auth/callback`，其他旧回调暂留登记但产品服务拒绝非中央主机回调。
 
 父域会话发送给所有子域，须将其视为同一信任域。端到端验收仍须使用真实浏览器证明登录、跨产品识别、支付、退款撤权和共享退出；构建与合成 Cookie 运输测试各有独立证据边界。
 

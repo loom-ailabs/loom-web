@@ -17,6 +17,11 @@ export type IdentityEnv = {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICE_ID?: string;
+  CREEM_MODE?: string;
+  CREEM_API_KEY?: string;
+  CREEM_WEBHOOK_SECRET?: string;
+  CREEM_PRODUCT_ID?: string;
+  CREEM_PRO_PRODUCT_ID?: string;
 };
 
 declare global {
@@ -37,6 +42,11 @@ const variableNames = [
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "STRIPE_PRICE_ID",
+  "CREEM_MODE",
+  "CREEM_API_KEY",
+  "CREEM_WEBHOOK_SECRET",
+  "CREEM_PRODUCT_ID",
+  "CREEM_PRO_PRODUCT_ID",
 ] as const;
 
 export async function getEnv(): Promise<IdentityEnv> {
@@ -45,7 +55,9 @@ export async function getEnv(): Promise<IdentityEnv> {
   for (const name of variableNames) {
     // Blank template values in .dev.vars must not hide next dev's .env.local.
     result[name] =
-      name === "STRIPE_MODE" ? (env[name] ?? process.env[name]) : env[name] || process.env[name];
+      name === "STRIPE_MODE" || name === "CREEM_MODE"
+        ? (env[name] ?? process.env[name])
+        : env[name] || process.env[name];
   }
   return result;
 }

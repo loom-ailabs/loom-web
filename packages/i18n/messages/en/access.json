@@ -5,6 +5,7 @@
   "description": "Manage your Loom account and feature access.",
   "security": "Secure sign-in · Hosted checkout · Access saved to your account",
   "back": "Back to Loom workspace",
+  "headshotPacks": "Professional headshot packages",
   "settings": "Preferences",
   "theme": "Appearance",
   "light": "Light",
@@ -77,12 +78,12 @@
   },
   "billing": {
     "test": {
-      "mode": "Sandbox",
-      "disclaimer": "Test payment · No real charge. The test amount is shown at checkout."
+      "mode": "Creem Test mode",
+      "disclaimer": "USD 1.00 · Test payment · No real charge. Creem hosts checkout. No subscription or automatic renewal."
     },
     "live": {
       "mode": "One-time purchase",
-      "disclaimer": "USD 1.00 · One-time purchase. Payment is collected securely on Stripe’s hosted checkout. No subscription or automatic renewal."
+      "disclaimer": "USD 1.00 · One-time purchase. Payment is collected securely on Creem’s hosted checkout. No subscription or automatic renewal."
     }
   }
 }

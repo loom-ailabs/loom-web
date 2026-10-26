@@ -1,5 +1,7 @@
 # 生产身份切换与支付模式
 
+2026-10-26 补充：全站新购买已统一使用 Creem Test mode，Loom Pro 与职业照包分别计权；当前对象和实测见 [Creem 接入说明](creem-test-integration.md)。本文以下记录原 Logto/Stripe 阶段的切换对象与历史验收，不能据此判断当前新购买仍走 Stripe。
+
 ## 当前状态与验收：已发布，双登录已确认
 
 两 Worker 已实际切换至 Logto 生产 Free 租户 `5z8hdi` 和独立生产 D1，并回读确认各承接 100% 流量。Stripe 继续使用原 Sandbox，`STRIPE_MODE=test`，Live 未开启。USD 1.00 单次购买已作为未来正式价格写入代码校验，但不代表已能收取真实款项。生产身份与测试支付是本次实际组合，不能把两者混称为 Live。

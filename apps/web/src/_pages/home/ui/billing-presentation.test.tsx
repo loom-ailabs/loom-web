@@ -43,9 +43,13 @@ describe("server-rendered product billing copy", () => {
           expect(markup).toContain('href="/terms"');
           expect(markup).toContain(messages.Common.privacy);
           expect(markup).toContain(messages.Common.terms);
+          expect(markup).not.toContain("Stripe");
           if (view !== "vision") {
             if (mode === "live") expect(markup).toContain("USD 1.00");
-            else expect(markup).toMatch(/Test payments only|当前付款仅用于测试/);
+            else {
+              expect(markup).toMatch(/Test payments only|当前付款仅用于测试/);
+              expect(markup).toContain("Creem");
+            }
           }
           if (mode === "live")
             expect(markup).not.toMatch(

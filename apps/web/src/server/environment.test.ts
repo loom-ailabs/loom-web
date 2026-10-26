@@ -10,6 +10,7 @@ vi.mock("@opennextjs/cloudflare", () => ({ getCloudflareContext }));
 
 import { getEnv } from "./env";
 import { getDatabase } from "./db";
+import { getBillingPresentationMode } from "./billing-presentation";
 
 const variableNames = [
   "APP_URL",
@@ -22,6 +23,7 @@ const variableNames = [
   "LOGTO_COOKIE_SECRET",
   "LOGTO_COOKIE_DOMAIN",
   "STRIPE_MODE",
+  "CREEM_MODE",
 ] as const;
 
 beforeEach(() => {
@@ -62,6 +64,33 @@ describe("Cloudflare environment boundary", () => {
     vi.stubEnv("STRIPE_MODE", "live");
     getCloudflareContext.mockResolvedValue({ env: { STRIPE_MODE: "" } });
     expect((await getEnv()).STRIPE_MODE).toBe("");
+  });
+
+  it("prefers Creem's worker mode while retaining the historical Stripe setting independently", async () => {
+    vi.stubEnv("CREEM_MODE", "prod");
+    vi.stubEnv("STRIPE_MODE", "test");
+    getCloudflareContext.mockResolvedValue({ env: { CREEM_MODE: "test", STRIPE_MODE: "live" } });
+    expect(await getEnv()).toMatchObject({ CREEM_MODE: "test", STRIPE_MODE: "live" });
+    expect(await getBillingPresentationMode()).toBe("test");
+  });
+
+  it.each(["", " ", "live", "prod"])(
+    "does not replace rejected Creem worker mode %j with a valid process fallback",
+    async (mode) => {
+      vi.stubEnv("CREEM_MODE", "test");
+      getCloudflareContext.mockResolvedValue({ env: { CREEM_MODE: mode } });
+      expect((await getEnv()).CREEM_MODE).toBe(mode);
+      await expect(getBillingPresentationMode()).rejects.toMatchObject({
+        status: 503,
+        code: "sandbox_required",
+      });
+    },
+  );
+
+  it("defaults the active Creem display to Test when its mode is absent", async () => {
+    getCloudflareContext.mockResolvedValue({ env: { STRIPE_MODE: "live" } });
+    expect((await getEnv()).CREEM_MODE).toBeUndefined();
+    expect(await getBillingPresentationMode()).toBe("test");
   });
 
   it("does not fabricate environment or database bindings after a runtime failure", async () => {

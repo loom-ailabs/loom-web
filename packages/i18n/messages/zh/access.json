@@ -5,6 +5,7 @@
   "description": "管理你的 Loom 账号和功能访问权限。",
   "security": "安全登录 · 托管收银台 · 使用权限随账号保存",
   "back": "返回 Loom 工作区",
+  "headshotPacks": "职业形象照套餐",
   "settings": "偏好设置",
   "theme": "外观",
   "light": "浅色",
@@ -77,12 +78,12 @@
   },
   "billing": {
     "test": {
-      "mode": "Sandbox",
-      "disclaimer": "测试支付 · 不会真实扣款。测试金额以收银台为准。"
+      "mode": "Creem 测试模式",
+      "disclaimer": "USD 1.00 · 测试支付，不会真实扣款。由 Creem 托管收银台，无订阅或自动续费。"
     },
     "live": {
       "mode": "一次性购买",
-      "disclaimer": "USD 1.00 · 一次性购买。通过 Stripe 托管收银台安全付款，无订阅或自动续费。"
+      "disclaimer": "USD 1.00 · 一次性购买。通过 Creem 托管收银台安全付款，无订阅或自动续费。"
     }
   }
 }

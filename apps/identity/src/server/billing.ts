@@ -1,6 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
-import { parseStripeMode } from "@hotkey-tools/identity-core/billing-mode";
+import { parseCreemMode, parseStripeMode } from "@hotkey-tools/identity-core/billing-mode";
 import { hasPremiumInDatabase } from "@hotkey-tools/identity-core/entitlements";
 import { getDatabase } from "./db";
 import { getEnv } from "./env";
@@ -18,7 +18,7 @@ const MAX_WEBHOOK_BYTES = 1_048_576;
 
 export async function hasPremium(userId: string): Promise<boolean> {
   const db = await getDatabase();
-  return hasPremiumInDatabase(db, userId, parseStripeMode((await getEnv()).STRIPE_MODE));
+  return hasPremiumInDatabase(db, userId, parseCreemMode((await getEnv()).CREEM_MODE));
 }
 
 export async function getOrderForUser(id: string, userId: string) {

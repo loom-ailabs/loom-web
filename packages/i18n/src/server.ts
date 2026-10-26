@@ -8,6 +8,13 @@ export async function getLegalMessages(locale: Locale) {
     : (await import("../messages/zh/legal.json")).default;
 }
 
+/** The Creem test purchase page loads its copy without changing other payment pages. */
+export async function getHeadshotMessages(locale: Locale) {
+  return locale === "en"
+    ? (await import("../messages/en/headshots.json")).default
+    : (await import("../messages/zh/headshots.json")).default;
+}
+
 function selectBilling<
   T extends { billing: { test: Record<string, string>; live: Record<string, string> } },
 >(messages: T, mode: "test" | "live") {

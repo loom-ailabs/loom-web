@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import { hasPremiumInDatabase } from "@hotkey-tools/identity-core/entitlements";
 import {
   SQLiteD1,
   databaseBinding,
@@ -130,10 +131,10 @@ describe.each(modes)("%s billing isolation", (mode) => {
     expect(db.raw.prepare("SELECT status FROM orders WHERE id=?").get(first.id)?.status).toBe(
       "refunded",
     );
-    expect(await hasPremium("alice")).toBe(true);
+    expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(true);
     other.refunds.push({ status: "succeeded", currency: "usd", amount: second.amount });
     await secondService.handleEvent(refundEvent("evt_other_refund", mode, second));
-    expect(await hasPremium("alice")).toBe(false);
+    expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(false);
     expect(
       db.raw.prepare("SELECT count(*) AS n FROM stripe_events WHERE stripe_mode=?").get(mode)?.n,
     ).toBe(5);
@@ -147,7 +148,7 @@ describe.each(modes)("%s billing isolation", (mode) => {
     await service.handleEvent(refundEvent("evt_early_refund", mode, order));
     fixture.refunds.length = 0;
     await service.handleEvent(completedEvent("evt_late_completed", mode, order));
-    expect(await hasPremium("alice")).toBe(false);
+    expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(false);
     expect(db.raw.prepare("SELECT count(*) AS n FROM entitlements").get()?.n).toBe(0);
   });
 
@@ -192,7 +193,7 @@ describe.each(modes)("%s billing isolation", (mode) => {
         await expect(
           new BillingService(db.binding(), fixture.stripe, modeConfig(mode)).handleEvent(event),
         ).rejects.toMatchObject({ code: "billing_mode_mismatch" });
-        expect(await hasPremium("alice")).toBe(false);
+        expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(false);
         expect(db.raw.prepare("SELECT count(*) AS n FROM stripe_events").get()?.n).toBe(0);
       },
     );
@@ -213,12 +214,12 @@ describe.each(modes)("%s billing isolation", (mode) => {
       const service = new BillingService(db.binding(), fixture.stripe, modeConfig(mode));
       if (stamp === mode) {
         await service.handleEvent(event);
-        expect(await hasPremium("alice")).toBe(true);
+        expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(true);
       } else {
         await expect(service.handleEvent(event)).rejects.toMatchObject({
           code: "payment_mismatch",
         });
-        expect(await hasPremium("alice")).toBe(false);
+        expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(false);
       }
     },
   );
@@ -248,7 +249,7 @@ describe.each(modes)("%s billing isolation", (mode) => {
     await expect(
       new BillingService(db.binding(), fixture.stripe, modeConfig(mode)).handleEvent(event),
     ).rejects.toMatchObject({ code: "payment_mismatch" });
-    expect(await hasPremium("alice")).toBe(false);
+    expect(await hasPremiumInDatabase(db.binding(), "alice", mode)).toBe(false);
     expect(db.raw.prepare("SELECT count(*) AS n FROM stripe_events").get()?.n).toBe(0);
   });
 
@@ -330,13 +331,20 @@ describe("configured production offer and cross-mode grants", () => {
     },
   );
 
-  it("never uses a test grant to unlock live or prevent a genuine Live purchase", async () => {
+  it("isolates legacy Live bookkeeping while the active Creem purchase mode stays Test", async () => {
     const test = seedOrder(db);
     const testStripe = stripeFixture(test);
     await new BillingService(db.binding(), testStripe.stripe, config).handleEvent(completedEvent());
     expect(await hasPremium("alice")).toBe(true);
-    environmentBinding.value = { STRIPE_MODE: "live" };
-    expect(await hasPremium("alice")).toBe(false);
+    environmentBinding.value = { STRIPE_MODE: "live", CREEM_MODE: "test" };
+    expect(await hasPremium("alice")).toBe(true);
+    expect(await hasPremiumInDatabase(db.binding(), "alice", "live")).toBe(false);
+    environmentBinding.value = { STRIPE_MODE: "test", CREEM_MODE: "live" };
+    await expect(hasPremium("alice")).rejects.toMatchObject({
+      code: "sandbox_required",
+      status: 503,
+    });
+    environmentBinding.value = { STRIPE_MODE: "live", CREEM_MODE: "test" };
     const live = stripeFixture(seedOrder(db, "live-template", "bob", "live"));
     await expect(
       new BillingService(db.binding(), live.stripe, modeConfig("live")).createCheckout(

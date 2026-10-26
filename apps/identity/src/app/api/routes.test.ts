@@ -23,15 +23,15 @@ const mocks = vi.hoisted(() => {
     ),
     getDatabase: vi.fn(async () => ({ prepare: vi.fn(() => ({ first })) })),
     hasPremium: vi.fn(async () => false),
-    createCheckout: vi.fn(async () => ({
+    createPurchaseCheckout: vi.fn(async () => ({
       orderId: "order-1",
-      checkoutUrl: "https://checkout.stripe.com/test",
+      checkoutUrl: "https://www.creem.io/test/payment/pro-fixture",
       status: "pending",
     })),
-    getOrderForUser: vi.fn(async () => ({
+    getPurchaseOrderForUser: vi.fn(async () => ({
       id: "order-1",
       status: "pending",
-      amount: 1200,
+      amount: 100,
       currency: "usd",
     })),
     handleStripeWebhook: vi.fn(async (_request: Request) => ({ received: true })),
@@ -43,9 +43,11 @@ vi.mock("@/server/env", () => ({ getEnv: mocks.getEnv }));
 vi.mock("@/server/db", () => ({ getDatabase: mocks.getDatabase }));
 vi.mock("@/server/billing", () => ({
   hasPremium: mocks.hasPremium,
-  createCheckout: mocks.createCheckout,
-  getOrderForUser: mocks.getOrderForUser,
   handleStripeWebhook: mocks.handleStripeWebhook,
+}));
+vi.mock("@/server/purchases", () => ({
+  createPurchaseCheckout: mocks.createPurchaseCheckout,
+  getPurchaseOrderForUser: mocks.getPurchaseOrderForUser,
 }));
 
 import { ApiError } from "@/server/http";
@@ -100,15 +102,15 @@ beforeEach(() => {
   mocks.getDatabase.mockResolvedValue({ prepare: vi.fn(() => ({ first: mocks.first })) });
   mocks.first.mockResolvedValue(null);
   mocks.hasPremium.mockResolvedValue(false);
-  mocks.createCheckout.mockResolvedValue({
+  mocks.createPurchaseCheckout.mockResolvedValue({
     orderId: "order-1",
-    checkoutUrl: "https://checkout.stripe.com/test",
+    checkoutUrl: "https://www.creem.io/test/payment/pro-fixture",
     status: "pending",
   });
-  mocks.getOrderForUser.mockResolvedValue({
+  mocks.getPurchaseOrderForUser.mockResolvedValue({
     id: "order-1",
     status: "pending",
-    amount: 1200,
+    amount: 100,
     currency: "usd",
   });
   mocks.handleStripeWebhook.mockResolvedValue({ received: true });
@@ -118,7 +120,7 @@ afterEach(() => vi.restoreAllMocks());
 describe("checkout API", () => {
   it("requires a logged-in user before calling billing", async () => {
     await expectFailure(await checkout(post("/api/checkout")), 401, "unauthenticated");
-    expect(mocks.createCheckout).not.toHaveBeenCalled();
+    expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
   });
 
   it.each([null, "https://attacker.example"])(
@@ -130,20 +132,20 @@ describe("checkout API", () => {
         "invalid_origin",
       );
       expect(mocks.getUser).not.toHaveBeenCalled();
-      expect(mocks.createCheckout).not.toHaveBeenCalled();
+      expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
     },
   );
 
   it("fails clearly when APP_URL is missing", async () => {
     mocks.getEnv.mockResolvedValue({});
     await expectFailure(await checkout(post("/api/checkout")), 503, "invalid_app_url");
-    expect(mocks.createCheckout).not.toHaveBeenCalled();
+    expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
   });
 
   it("rejects malformed JSON without creating a pending payment", async () => {
     mocks.getUser.mockResolvedValue(alice);
     await expectFailure(await checkout(post("/api/checkout", "{")), 400, "invalid_json");
-    expect(mocks.createCheckout).not.toHaveBeenCalled();
+    expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
   });
 
   it.each([null, 1, [], {}, { requestId: 123 }])(
@@ -151,7 +153,7 @@ describe("checkout API", () => {
     async (body) => {
       mocks.getUser.mockResolvedValue(alice);
       await expectFailure(await checkout(post("/api/checkout", body)), 400, "invalid_request_id");
-      expect(mocks.createCheckout).not.toHaveBeenCalled();
+      expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
     },
   );
 
@@ -167,16 +169,45 @@ describe("checkout API", () => {
       msg: "success",
       data: {
         orderId: "order-1",
-        checkoutUrl: "https://checkout.stripe.com/test",
+        checkoutUrl: "https://www.creem.io/test/payment/pro-fixture",
         status: "pending",
       },
     });
-    expect(mocks.createCheckout).toHaveBeenCalledExactlyOnceWith(alice, requestId);
+    expect(mocks.createPurchaseCheckout).toHaveBeenCalledExactlyOnceWith(alice, requestId, "en");
   });
+
+  it.each(["en", "zh"] as const)(
+    "preserves the selected %s locale for the Creem payment return",
+    async (locale) => {
+      mocks.getUser.mockResolvedValue(alice);
+      const response = await checkout(post("/api/checkout", { requestId, locale }));
+      expect(response.status).toBe(200);
+      expect(mocks.createPurchaseCheckout).toHaveBeenCalledExactlyOnceWith(
+        alice,
+        requestId,
+        locale,
+      );
+    },
+  );
+
+  it.each([null, "", "fr", "zh-CN", 12, false])(
+    "rejects invalid checkout locale %j before creating a provider checkout",
+    async (locale) => {
+      mocks.getUser.mockResolvedValue(alice);
+      await expectFailure(
+        await checkout(post("/api/checkout", { requestId, locale })),
+        400,
+        "invalid_json",
+      );
+      expect(mocks.createPurchaseCheckout).not.toHaveBeenCalled();
+    },
+  );
 
   it("preserves a recoverable Checkout error code", async () => {
     mocks.getUser.mockResolvedValue(alice);
-    mocks.createCheckout.mockRejectedValue(new ApiError(502, "checkout_unavailable", "请重试。"));
+    mocks.createPurchaseCheckout.mockRejectedValue(
+      new ApiError(502, "checkout_unavailable", "请重试。"),
+    );
     await expectFailure(await checkout(post("/api/checkout")), 502, "checkout_unavailable");
   });
 });
@@ -223,19 +254,21 @@ describe("identity, orders and premium APIs", () => {
 
   it("requires auth before order lookup and passes the authenticated owner to storage", async () => {
     await expectFailure(await order(orderRequest(), orderParams()), 401, "unauthenticated");
-    expect(mocks.getOrderForUser).not.toHaveBeenCalled();
+    expect(mocks.getPurchaseOrderForUser).not.toHaveBeenCalled();
     mocks.getUser.mockResolvedValue(alice);
     const response = await order(orderRequest(), orderParams());
     expect(await response.json()).toMatchObject({
       code: 0,
       data: { order: { id: "order-1", status: "pending" } },
     });
-    expect(mocks.getOrderForUser).toHaveBeenCalledExactlyOnceWith("order-1", "alice");
+    expect(mocks.getPurchaseOrderForUser).toHaveBeenCalledExactlyOnceWith("order-1", "alice");
   });
 
   it("hides unavailable or other-user orders with the same 404 response", async () => {
     mocks.getUser.mockResolvedValue(alice);
-    mocks.getOrderForUser.mockRejectedValue(new ApiError(404, "order_not_found", "未找到此订单。"));
+    mocks.getPurchaseOrderForUser.mockRejectedValue(
+      new ApiError(404, "order_not_found", "未找到此订单。"),
+    );
     await expectFailure(await order(orderRequest(), orderParams()), 404, "order_not_found");
   });
 

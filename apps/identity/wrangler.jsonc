@@ -19,6 +19,9 @@
     "LOGTO_APP_ID": "qc6kvqsqa3k4ti63rmom7",
     "STRIPE_MODE": "test",
     "STRIPE_PRICE_ID": "price_1UTNA2K268Z7hNOawKnuuMQL",
+    "CREEM_MODE": "test",
+    "CREEM_PRODUCT_ID": "prod_6ntBKFLfAklD4ipCBu5exj",
+    "CREEM_PRO_PRODUCT_ID": "prod_7axKhvtA10UxHeQlhFi91U",
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -46,6 +49,9 @@
         "LOGTO_APP_ID": "7wqbzelu2ey5n5brfr73d",
         "STRIPE_MODE": "test",
         "STRIPE_PRICE_ID": "price_1UTNA2K268Z7hNOawKnuuMQL",
+        "CREEM_MODE": "test",
+        "CREEM_PRODUCT_ID": "prod_6ntBKFLfAklD4ipCBu5exj",
+        "CREEM_PRO_PRODUCT_ID": "prod_7axKhvtA10UxHeQlhFi91U",
       },
       "d1_databases": [
         {

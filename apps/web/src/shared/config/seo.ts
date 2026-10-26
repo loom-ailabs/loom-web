@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getSeoMessages } from "@hotkey-tools/i18n/seo";
 import { languageTag, localizePath, type Locale } from "@hotkey-tools/i18n/routing";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 
 export const SITE_URL = "https://www.loom-labs.ai";
 export const SITE_NAME = "Loom AI";
@@ -21,7 +21,7 @@ const pages = [
   { path: "/terms", key: "terms" },
 ] as const;
 export type PublicPath = (typeof pages)[number]["path"];
-export function publicPagesForLocale(locale: Locale, billingMode: StripeMode = "test") {
+export function publicPagesForLocale(locale: Locale, billingMode: PaymentMode = "test") {
   const messages = getSeoMessages(locale);
   return pages.map((page) => ({
     path: page.path,
@@ -38,7 +38,7 @@ export function publicPageUrl(path: PublicPath, locale: Locale = "en"): string {
 export function createPageMetadata(
   path: PublicPath,
   locale: Locale = "en",
-  billingMode: StripeMode = "test",
+  billingMode: PaymentMode = "test",
 ): Metadata {
   const page = publicPagesForLocale(locale, billingMode).find(
     (candidate) => candidate.path === path,
@@ -104,7 +104,7 @@ export const siteStructuredData = createSiteStructuredData("en");
 export function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
-export function createLlmsIndex(locale: Locale, billingMode: StripeMode = "test") {
+export function createLlmsIndex(locale: Locale, billingMode: PaymentMode = "test") {
   const m = getSeoMessages(locale);
   return `# ${SITE_NAME}\n\n> ${m.description}\n\n${billingMode === "live" ? m.live.boundary : m.boundary}\n\n## ${m.publicPages}\n\n${publicPagesForLocale(
     locale,
@@ -115,7 +115,7 @@ export function createLlmsIndex(locale: Locale, billingMode: StripeMode = "test"
       "\n",
     )}\n\n## ${m.publicText}\n\n- [${m.textLink}](${SITE_URL}${localizePath("/llms-full.txt", locale)}): ${m.textDescription}\n`;
 }
-export function createLlmsFullText(locale: Locale, billingMode: StripeMode = "test") {
+export function createLlmsFullText(locale: Locale, billingMode: PaymentMode = "test") {
   const m = getSeoMessages(locale);
   return `# ${SITE_NAME} ${m.publicTitle}\n\n> ${m.privateBoundary}\n\n${publicPagesForLocale(
     locale,

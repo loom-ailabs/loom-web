@@ -4,20 +4,22 @@
 
 从初始化、身份源配置到支付联调的步骤见 [Identity 应用说明](apps/identity/README.md)。仓库工作约定见 [AGENTS.md](AGENTS.md)。
 
-两 Worker 已发布 Logto 生产 Free 身份与独立 D1，真实联调进行中；对象、版本与验收状态统一记录在[生产切换说明](docs/production-cutover.md)。本次继续 Stripe Sandbox，Live 关闭，正式 USD 1.00 仅作代码准备，不代表已开放真实付款。
+两 Worker 使用 Logto 生产 Free 身份与独立 D1。全站新购买已统一 Creem Test mode：Loom Pro 为 USD 1.00，职业形象照包为 USD 9.99；均不会真实扣款。Stripe 保留历史订单查询和退款处理。当前配置与验收见 [Creem 接入说明](docs/creem-test-integration.md)，原身份切换记录见[生产切换说明](docs/production-cutover.md)。
+
+职业形象照包是独立的 Creem Test 商品：USD 9.99 单次购买，按订单记录 4 张成片及 1 次重做的套餐权益，支持重复购买与全额退款撤权。入口为账户应用的 `/headshots`、`/zh/headshots`；照片上传、生成和下载尚未开放。职业照套餐不授予 Loom Pro，两种商品的来源订单和退款撤权分别处理。配置与分阶段验收见 [Creem 测试支付接入](docs/creem-test-integration.md)。
 
 ## 应用与共享包
 
-| 目录                          | 技术栈                                                        | 职责                                                      |
-| ----------------------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
-| `apps/identity`               | Next.js 16、React 19、Tailwind CSS 4、Logto、Stripe、OpenNext | 默认产品：账户、购买、订单与付费鉴权；页面和 API 同源     |
-| `packages/ui`                 | shadcn/ui 风格组件、Tailwind 主题变量、`cn()`                 | 共享 Button、Card、Badge、Alert 等基础组件                |
-| `apps/web`                    | Next.js 16、React 19、TypeScript                              | Loom AI 主站、工作区与受保护功能 API                      |
-| `apps/worker`                 | TypeScript、Hono、Wrangler、D1                                | 既有静态资源托管、示例 API 与 Python service binding 网关 |
-| `apps/python`                 | Python 3.13、FastAPI、Pydantic                                | 快捷键规范化示例，可运行于 CPython 或 Python Worker       |
-| `packages/python/hotkey-core` | Python、uv workspace                                          | Python 共享业务库                                         |
+| 目录                          | 技术栈                                                       | 职责                                                      |
+| ----------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
+| `apps/identity`               | Next.js 16、React 19、Tailwind CSS 4、Logto、Creem、OpenNext | 默认产品：账户、购买、订单与付费鉴权；页面和 API 同源     |
+| `packages/ui`                 | shadcn/ui 风格组件、Tailwind 主题变量、`cn()`                | 共享 Button、Card、Badge、Alert 等基础组件                |
+| `apps/web`                    | Next.js 16、React 19、TypeScript                             | Loom AI 主站、工作区与受保护功能 API                      |
+| `apps/worker`                 | TypeScript、Hono、Wrangler、D1                               | 既有静态资源托管、示例 API 与 Python service binding 网关 |
+| `apps/python`                 | Python 3.13、FastAPI、Pydantic                               | 快捷键规范化示例，可运行于 CPython 或 Python Worker       |
+| `packages/python/hotkey-core` | Python、uv workspace                                         | Python 共享业务库                                         |
 
-新产品使用 `apps/<产品名>` 下的独立 Next.js 全栈应用。共享认证、HTTP 与权益查询位于 `packages/identity-core`；Stripe 逻辑只在 `apps/identity`。旧 `apps/worker` 使用自己的静态占位页与示例 API。Python 仅在实际需要时作为独立能力服务使用。
+新产品使用 `apps/<产品名>` 下的独立 Next.js 全栈应用。共享认证、HTTP 与权益查询位于 `packages/identity-core`；支付 SDK 与 Webhook 只在 `apps/identity`。旧 `apps/worker` 使用自己的静态占位页与示例 API。Python 仅在实际需要时作为独立能力服务使用。
 
 仓库更名不改变现有包名和运行标识：文档中的 `@hotkey-tools/*`、`hotkey-tools-core`、数据库名及订单业务标识仍与实际配置一致；历史部署记录保留当时的资源名称。
 
@@ -34,7 +36,7 @@ mise run dev
 
 默认访问 `http://localhost:3001`。`dev` 会先应用 Identity 本地 D1 migrations，再启动 Next.js 开发服务器；Cloudflare bindings 由 OpenNext 提供本地模拟。
 
-`setup` 安装工具链、按锁文件安装 pnpm 依赖及 uv workspace 成员，在文件缺失时创建根 `.env`、Identity 的 `.env.local` 与 `.dev.vars`，并应用各应用数据库的本地迁移。重复执行不会覆盖已有环境文件或重置数据库。Logto 和 Stripe 凭据仍需按 [应用说明](apps/identity/README.md) 配置；配置不完整时，页面会显示服务待配置，相关 API 返回 503。
+`setup` 安装工具链、按锁文件安装 pnpm 依赖及 uv workspace 成员，在文件缺失时创建根 `.env`、Identity 的 `.env.local` 与 `.dev.vars`，并应用各应用数据库的本地迁移。重复执行不会覆盖已有环境文件或重置数据库。Logto 和 Creem 凭据按 [应用说明](apps/identity/README.md) 配置；历史 Stripe Webhook 保留原凭据。配置不完整时相关 API 返回 503。
 
 | 命令                                     | 用途                                           |
 | ---------------------------------------- | ---------------------------------------------- |
@@ -103,7 +105,7 @@ mise identity status
 mise identity db-create
 # 将输出的 database_id 填入 apps/identity/wrangler.jsonc
 mise identity db-migrate
-# 配置 APP_URL、Logto、Stripe Sandbox 和 Worker Secrets，见应用说明
+# 配置 APP_URL、Logto、Creem Test 和 Worker Secrets，见应用说明
 mise identity deploy
 ```
 
@@ -124,7 +126,7 @@ mise exec -- pnpm deploy:examples
 
 ## Loom AI 主站
 
-两应用通过 `packages/i18n` 共享 next-intl 中英文能力：英文默认使用根路径，中文使用 `/zh`；旧 `/en` 页面地址保留 query 并规范跳转到对应英文根路径。语言与浅色、深色、跟随系统外观使用仅含偏好值的父域 Cookie。个人信息页 `/account`、`/zh/account` 禁止索引；API、登录回调和支付端点不加语言前缀，认证与权益规则保持不变。配置、消息分工和 SEO 说明见[国际化说明](docs/internationalization.md)。
+两应用通过 `packages/i18n` 共享 next-intl 中英文能力：英文默认使用根路径，中文使用 `/zh`；旧 `/en` 页面地址保留 query 并规范跳转到对应英文根路径。共享语言菜单按 English、简体中文排序，保留用户已保存的偏好。语言与浅色、深色、跟随系统外观使用仅含偏好值的父域 Cookie。个人信息页 `/account`、`/zh/account` 禁止索引；API、登录回调和支付端点不加语言前缀，认证与权益规则保持不变。配置、消息分工和 SEO 说明见[国际化说明](docs/internationalization.md)。
 
 导航账号状态由布局中的 `ProductAccessProvider` 在客户端路由间保留；首次完整加载读取一次，不在窗口聚焦、页面可见性变化、定时器或客户端路由切换时重新同步。用户可手动刷新状态，受保护操作仍逐次检查服务端会话和权益。导航不显示“Syncing”等同步文字；头像外框为 28px（边框内图片 26px），点击范围为 40px，四项菜单图标均为 16px。登录操作区居中，右侧轮播默认自动播放，可视控制只保留分页点，并保留键盘可达的暂停/播放与减少动态效果支持。本地浏览器验证从愿景进入工作区不新增 `/api/me` 请求，手动刷新新增一次；线上也确认客户端导航不重复读取账号。
 
@@ -144,9 +146,9 @@ mise run web:deploy-dry-run
 mise run web:deploy
 ```
 
-主站由 `loom-web` Worker 承载 www 自定义域，统一登录与购买由 `loom-identity` Worker 提供；两者分别由原 `vite-react-template`、`hotkey-tools-identity` 原地更名。源码位于 `apps/web` 与 `apps/identity`，旧 D1 `hotkey-tools-identity` 保留，生产目标使用独立数据库。主站 Git Builds 的仓库与构建设置见 [Web 部署说明](apps/web/README.md)。部署环境由 login 写入父域随机会话标识，所有 Loom 子域都属于同一会话信任范围；D1 保存加密状态和撤销标记，退出先撤销再删除共享 Cookie。本地使用明确配置的 localhost 地址，不设置正式父域；Cookie 不按端口隔离，两应用需使用同一环境的会话配置和数据库。发布新支付代码前目标库须完成 `0001`—`0004`；14 天内清除 Cookie、主动退出、上游失效或安全异常仍可能要求重登。
+主站由 `loom-web` Worker 承载 www 自定义域，统一登录与购买由 `loom-identity` Worker 提供；两者分别由原 `vite-react-template`、`hotkey-tools-identity` 原地更名。源码位于 `apps/web` 与 `apps/identity`，旧 D1 `hotkey-tools-identity` 保留，生产目标使用独立数据库。主站 Git Builds 的仓库与构建设置见 [Web 部署说明](apps/web/README.md)。部署环境由 login 写入父域随机会话标识，所有 Loom 子域都属于同一会话信任范围；D1 保存加密状态和撤销标记，退出先撤销再删除共享 Cookie。本地使用明确配置的 localhost 地址，不设置正式父域；Cookie 不按端口隔离，两应用需使用同一环境的会话配置和数据库。发布当前支付代码前目标库须顺序完成 `0001`—`0006`，再发布 Identity 与 WWW；Identity 配置 `CREEM_PRODUCT_ID`、`CREEM_PRO_PRODUCT_ID` 及支付密钥，两应用均仅接受 `CREEM_MODE=test`。14 天内清除 Cookie、主动退出、上游失效或安全异常仍可能要求重登。
 
-工作区当前提供人工整理的静态工作计划，不调用模型、创建文件或执行外部工具。产品界面使用工作计划、账号和访问权限等正式措辞，不以界面文案虚构生成或执行能力。用户到 checkout 进行 USD 1.00 Sandbox 单次测试付款后，可返回工作区手动刷新权益并打开计划；购买位置清楚标注测试支付、不真实扣款。每次受保护操作均重新查询服务端权益，全额退款后拒绝继续访问。
+工作区当前提供人工整理的静态工作计划，不调用模型、创建文件或执行外部工具。产品界面使用工作计划、账号和访问权限等正式措辞，不以界面文案虚构生成或执行能力。用户到 checkout 通过 Creem Test mode 进行 USD 1.00 单次测试付款后，可返回工作区手动刷新权益并打开计划；购买位置清楚标注测试支付、不真实扣款。每次受保护操作均重新查询本用户的有效 Pro 来源订单，全额退款只撤回对应订单权限。
 
 ## Python workspace
 

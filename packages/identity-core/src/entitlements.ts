@@ -15,8 +15,15 @@ export async function hasPremiumInDatabase(
  WHERE e.user_id = ? AND e.product_key = ? AND e.feature_key = ? AND e.revoked_at IS NULL
    AND o.status = 'paid' AND o.stripe_mode = ?
    AND (o.checkout_payload_version = 2
-     OR (o.stripe_mode = 'test' AND o.checkout_payload_version = 1)) LIMIT 1`)
-    .bind(userId, PRODUCT_KEY, FEATURE_KEY, mode)
+     OR (o.stripe_mode = 'test' AND o.checkout_payload_version = 1))
+ UNION ALL
+ SELECT p.order_id FROM creem_pro_entitlements p
+ JOIN creem_orders o ON o.id = p.order_id AND o.user_id = p.user_id
+ WHERE p.user_id = ? AND p.revoked_at IS NULL AND o.status = 'paid'
+   AND o.mode = ? AND o.product_key = 'loom_pro'
+   AND o.amount = 100 AND o.currency = 'USD'
+ LIMIT 1`)
+    .bind(userId, PRODUCT_KEY, FEATURE_KEY, mode, userId, mode)
     .first<{ order_id: string }>();
   return row !== null;
 }

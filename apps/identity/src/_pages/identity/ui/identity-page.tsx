@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import type { StripeMode } from "@hotkey-tools/identity-core/billing-types";
+import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
 import { localizeUrl, useTranslations } from "@hotkey-tools/i18n";
 import { Link, useLocaleSwitcher } from "@hotkey-tools/i18n/navigation";
 import { Badge, PreferencesMenu } from "@hotkey-tools/ui";
 import { ArrowUpRight, CreditCard, FlaskConical, ShieldCheck } from "lucide-react";
 import { ManageAccess } from "@/features/manage-access";
 
-export function IdentityPage({ billingMode }: { billingMode: StripeMode }) {
+export function IdentityPage({ billingMode }: { billingMode: PaymentMode }) {
   const t = useTranslations("Access");
   const common = useTranslations("Common");
   const { locale, switchLocale } = useLocaleSwitcher();
@@ -63,6 +63,13 @@ export function IdentityPage({ billingMode }: { billingMode: StripeMode }) {
           <p className="text-sm leading-7 text-muted-foreground">{t("description")}</p>
         </div>
         <ManageAccess billingMode={billingMode} />
+        <Link
+          href="/headshots"
+          className="inline-flex items-center gap-1.5 rounded-md text-sm text-link outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {t("headshotPacks")}
+          <ArrowUpRight className="size-4" aria-hidden="true" />
+        </Link>
         <p className="flex items-center justify-center gap-2 text-center text-xs leading-relaxed text-muted-foreground">
           <ShieldCheck className="size-4 shrink-0" aria-hidden="true" />
           {t("security")}

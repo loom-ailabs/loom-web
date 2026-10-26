@@ -1,6 +1,6 @@
 # 生产身份切换与支付模式
 
-## 当前状态与验收：已发布，身份绑定待确认
+## 当前状态与验收：已发布，双登录已确认
 
 两 Worker 已实际切换至 Logto 生产 Free 租户 `5z8hdi` 和独立生产 D1，并回读确认各承接 100% 流量。Stripe 继续使用原 Sandbox，`STRIPE_MODE=test`，Live 未开启。USD 1.00 单次购买已作为未来正式价格写入代码校验，但不代表已能收取真实款项。生产身份与测试支付是本次实际组合，不能把两者混称为 Live。
 
@@ -19,11 +19,11 @@
 | 统一退出与重放拒绝 | GitHub 会话退出后三域均匿名，SID/Flow 清除；真实旧 SID 重放被拒绝，重放测试 Cookie 已清理。Google 登录验收后也已退出，login 的 `/api/me` 确认匿名                                                                                                                                       |
 | GitHub 重登持权    | 付款后、退款前的 GitHub 退出重登已验证：仍为同一非空用户 ID、premium 恢复，新 SID 与已撤销旧 SID 不同；不代表退款后仍有 Pro                                                                                                                                                             |
 | Sandbox 退款撤权   | 唯一退款 `re_3UTixRK268Z7hNOa02NZhwjU` 成功，100 cents 全额退回；D1 订单 refunded、grant revoked，3 个退款事件 processed 且 pending_webhooks=0。退款验收时用户仍已登录，WWW 高级 API 返回 403/premium_required，premium=false；手动刷新工作区显示 Signed in · Explore，最终有效权益为 0 |
-| 身份绑定待确认     | Logto 当前账号存在 GitHub、Google 两条 Social connections；保留两个登录方式或解除 Google 绑定已询问用户，尚待决定，未执行解绑。当前不能据此宣称两身份源账号隔离通过                                                                                                                     |
+| 双登录方式已确认   | 2026-10-24 用户明确确认保留现有 Google/GitHub 两个登录方式，共用同一账号及其服务端权益；未执行解绑或修改自动关联策略。退款后当前有效权益仍为 0，不代表两身份源账号隔离通过                                                                                                              |
 
 以下对象配置和旧验收分开记录，不将配置存在或旧租户登录成功当作本轮通过。本轮证据位于 `.codex-artifacts/production-cutover/`：`production-shared-session-e2e.json`、`production-logout-e2e.json`、`production-sandbox-payment.json`、`production-relogin-e2e.json`、`production-sandbox-refund.json`、`production-refund-ui-api.json` 与 `production-google-e2e.json`；不记录原始 SID、令牌或个人资料。
 
-同邮箱自动关联开关当前回读为关闭（Value 0），但关闭开关不会解除已有身份连接。Agent 未执行 Link/Bind 操作；审计目前仅确认首次 Social GitHub 注册和本次 Google SignIn，尚未建立两条身份连接的关联时间与原因。因此不声称“未发生关联”，也不将当前开关状态当作历史关联行为的证明；唯一待办是用户决定保留两个登录方式或解除 Google 绑定。
+同邮箱自动关联开关仍关闭（Value 0），关闭开关不会解除已有身份连接。本次未执行 Link/Bind 操作；审计仅确认首次 Social GitHub 注册和本次 Google SignIn，两条身份连接形成的时间与原因未确定，作为历史说明保留。2026-10-24 用户已明确选择保留现有双登录方式，该确认事项已关闭；不据此开启全局自动关联，也不推断未来同邮箱身份会自动合并。
 
 ## 已配置对象
 
@@ -39,7 +39,7 @@
 | Logto 品牌              | 生产租户已保存并重载：Dark mode 开启、浅色主色 `#3A72B3`、深色主色 `#8BBFFF`，复用仓库 CSS；未上传原生 Logo/Favicon，未启用 Pro                                                                                                                           |
 | Stripe                  | 保留同一 Sandbox 的 USD 1.00（100 cents）Price、测试密钥和 Webhook；Live 未开启                                                                                                                                                                           |
 
-Google connector 以本表最终 ID 为准，早期未保存的临时 ID 不作为有效对象。四个经用户批准的法务页面已上线并取得 200：[Privacy](https://www.loom-labs.ai/privacy)、[Terms](https://www.loom-labs.ai/terms)、[中文隐私说明](https://www.loom-labs.ai/zh/privacy)、[中文使用规则](https://www.loom-labs.ai/zh/terms)。Google 已登记 Privacy/Terms，并按用户批准正式发布 OAuth 应用；Audience 实际回读“发布状态：正式版”“用户类型：外部”，操作为“返回测试版”。品牌验证随后通过并完成发布，控制台回读“您的品牌已经过验证，正在向用户显示”；数据访问仅含 openid、基本资料和邮箱，验证中心确认不涉及敏感或受限范围。Google、GitHub 的真实应用回调均已通过，当前账号的双身份源连接状态及待决策边界见上方验收记录。
+Google connector 以本表最终 ID 为准，早期未保存的临时 ID 不作为有效对象。四个经用户批准的法务页面已上线并取得 200：[Privacy](https://www.loom-labs.ai/privacy)、[Terms](https://www.loom-labs.ai/terms)、[中文隐私说明](https://www.loom-labs.ai/zh/privacy)、[中文使用规则](https://www.loom-labs.ai/zh/terms)。Google 已登记 Privacy/Terms，并按用户批准正式发布 OAuth 应用；Audience 实际回读“发布状态：正式版”“用户类型：外部”，操作为“返回测试版”。品牌验证随后通过并完成发布，控制台回读“您的品牌已经过验证，正在向用户显示”；数据访问仅含 openid、基本资料和邮箱，验证中心确认不涉及敏感或受限范围。Google、GitHub 的真实应用回调均已通过，当前账号保留双登录方式的用户确认及适用边界见上方验收记录。
 
 WWW Git Builds 已从 `feat/production-cutover` 的后续文档与检查脚本提交 `b9bf7d8` 自动构建并部署 `bd55c5bf-f9b3-4e86-81a7-9f26f82f6969`，CLI 与控制台均回读 100% 流量。该版本仍使用生产 Logto、新 D1 与 Stripe test；26 项线上匿名检查再次通过。上表保留首次切换的版本作为发布基线，后续纯文档提交可能继续产生新的自动部署版本。
 

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaymentMode } from "@hotkey-tools/identity-core/billing-types";
+import { getSeoMessages } from "@hotkey-tools/i18n/seo";
 const runtime = vi.hoisted(() => ({ mode: "test" as PaymentMode }));
 vi.mock("@/server/billing-presentation", () => ({
   getBillingPresentationMode: async () => runtime.mode,
@@ -140,6 +141,18 @@ describe("public search and agent discovery", () => {
       /Offer|AggregateRating|Review|priceCurrency/,
     );
   });
+
+  it.each(["en", "zh"] as const)(
+    "publishes the visible product questions in the %s full-text feed",
+    (locale) => {
+      const { faq } = getSeoMessages(locale);
+      const text = createLlmsFullText(locale);
+      expect(text).toContain(`## ${faq.title}`);
+      for (const { question, answer } of faq.items) {
+        expect(text).toContain(`### ${question}\n\n${answer}`);
+      }
+    },
+  );
 
   it.each(["en", "zh"] as const)(
     "keeps metadata and public text accurate for test/live %s requests",

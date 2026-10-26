@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "@hotkey-tools/i18n";
 import { Link } from "@hotkey-tools/i18n/navigation";
 import { Button, GlassSurface } from "@hotkey-tools/ui";
-import { ArrowRight, Braces, Globe2, Monitor, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ListChecks, PencilLine, Sparkles } from "lucide-react";
 import { IntelligenceWeave } from "./intelligence-weave";
 
 export function HeroBanner() {
@@ -43,7 +43,7 @@ export function HeroBanner() {
         <GlassSurface
           className="mt-10 inline-flex flex-wrap items-center justify-center gap-3 rounded-2xl px-4 py-3 sm:gap-5"
           role="img"
-          aria-label={t("orbitLabel")}
+          aria-label={t("useCasesLabel")}
         >
           <Image
             src="/loom-mark.svg"
@@ -55,9 +55,9 @@ export function HeroBanner() {
           />
           <span className="hidden h-5 border-l sm:block" aria-hidden="true" />
           {[
-            { Icon: Monitor, label: t("desktop") },
-            { Icon: Globe2, label: t("browser") },
-            { Icon: Braces, label: t("editor") },
+            { Icon: PencilLine, label: t("writing") },
+            { Icon: BookOpen, label: t("learning") },
+            { Icon: ListChecks, label: t("everydayLife") },
           ].map(({ Icon, label }) => (
             <span key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
               <Icon className="size-4 text-link" aria-hidden="true" />
@@ -66,7 +66,7 @@ export function HeroBanner() {
           ))}
         </GlassSurface>
         <p className="mt-5 font-mono text-xs tracking-widest text-muted-foreground">
-          CONNECTING INTELLIGENCE. CRAFTING TOMORROW.
+          {t("footerVision")}
         </p>
       </div>
     </section>

@@ -1,20 +1,38 @@
-# 搜索与 AI 阅读入口
+# Search and AI discovery
 
-Loom AI 的六个公开页面提供中英文共十二个可抓取 URL、独立元数据和机器阅读入口。当前工作区提供人工整理的静态计划。已准备的代码按服务端 `STRIPE_MODE` 选择支付说明，test 明确不真实扣款，live 使用 USD 1.00 单次购买文案；用户本次决定继续 Sandbox，Live 关闭，不能将价格代码准备写成已可收取正式款项。身份与支付切换进度见[统一记录](production-cutover.md)。代码配置、已发布站点、搜索引擎抓取、索引和排名分别验证。
+## Product positioning
 
-## 已实现的入口
+**Everyday AI. For everyone.**
 
-| 入口                                                                             | 当前行为                                                                                                                                                    |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`、`/vision`、`/workspace`、`/pricing`、`/privacy`、`/terms` 及对应 `/zh` 路径 | 英文默认无前缀，中文使用 `/zh`，正文由 Next.js 首次渲染；输出对应语言的标题、描述、canonical 和 hreflang。公开介绍可匿名阅读，工作区权益仍由私有 API 校验。 |
-| 分享元数据                                                                       | 每页 Open Graph 和 Twitter Card 使用同页绝对地址、对应语言和模式文案及原有 1254×1254 `/loom.png`，不重绘 Logo。                                             |
-| JSON-LD                                                                          | `Organization` 与 `WebSite` 只包含实际品牌、站点、语言及 Logo；输出前转义 `<`。没有虚构评分、评论、地址、商业 Offer 或真实模型能力。                        |
-| `/robots.txt`                                                                    | 允许公共内容抓取，并指向本站 sitemap。私有 API 通过认证、`private, no-store` 及 `X-Robots-Tag: noindex, nofollow, noarchive` 控制，不依靠 robots 隐藏信息。 |
-| `/sitemap.xml`                                                                   | 列出六页两种语言的十二个公开 canonical URL；不列登录回调、用户、订单或支付接口。没有可靠内容更新时间时不生成虚假的 `lastmod`。                              |
-| `/llms.txt`                                                                      | Markdown 格式的站点说明、六个公开页面入口与纯文本正文链接，供主动支持该约定的 agent 使用。                                                                  |
-| `/llms-full.txt`                                                                 | 六个页面的精简公开说明；只含产品方向、工作计划、当前支付模式与能力边界，按请求读取公开模式配置，不读取会话或数据库。                                        |
+Loom AI is building simple ways for anyone to use AI for writing, learning, and everyday tasks. The aim is to bring practical AI tools, templates, skills, and plugins together in experiences that start with what people want to do, without requiring a technical background.
 
-元数据与公开内容集中在 `apps/web/src/shared/config/seo.ts`。新增公开页面时同时维护 canonical、sitemap 和正文；产品能力变化时更新公开正文，避免 HTML 与纯文本描述分歧。Next.js 使用官方 [Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)、[robots](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots)、[sitemap](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap)和 [JSON-LD 输出方式](https://nextjs.org/docs/app/guides/json-ld)。
+Native English speakers are the primary audience. Write English copy for that audience first, then adapt it into natural Simplified Chinese. Lead with everyday needs and clear benefits. Explain the underlying tools, templates, skills, and plugins in the platform introduction rather than asking visitors to understand those terms before they can get started.
+
+The current site introduces the product vision and provides curated work plans for reading and planning. It does not yet run AI models, create files, or perform external actions. Describe the wider tool experience as something we are building until the corresponding features are available. Current purchases use the server-validated `CREEM_MODE=test`; they incur no real charge. Stripe is retained for historical orders and refunds. See the [production cutover record](production-cutover.md) and [Creem integration guide](creem-test-integration.md) for the current identity and payment scope.
+
+## Consistent public copy
+
+The homepage, vision page, search metadata, social previews, structured data, and public text feeds must describe the same product and the same available capabilities. Keep the brand name `Loom AI` consistent across these surfaces. Use a self-contained platform description that says who the product is for, what needs it addresses, and how it aims to make AI easier to use. Separate those goals from what visitors can access today.
+
+English uses the root URLs; Simplified Chinese uses `/zh`. Maintain both languages together without changing the default language or overriding a saved preference. `packages/i18n/messages/en/seo.json` and `packages/i18n/messages/zh/seo.json` hold the localized search and public text copy. Their `web.json` counterparts hold the visible product copy. `apps/web/src/shared/config/seo.ts` generates metadata, structured data, and text feeds from those messages.
+
+The homepage and vision page also display the audience, setup, and current availability questions stored in the SEO catalogs. The full text feed includes the same questions and answers, so visible explanations and agent-readable content stay aligned.
+
+When adding a public page, update its canonical URL, sitemap entry, and public text description together. When a feature becomes available, update both the visible page and its public text description. Copy changes, a deployed site, crawler access, indexing, and rankings require separate verification.
+
+## Public entry points
+
+| Entry point                                                                                 | Behavior                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`, `/vision`, `/workspace`, `/pricing`, `/privacy`, `/terms`, and their `/zh` equivalents | Twelve public canonical URLs across two languages. Next.js renders the initial content and provides localized titles, descriptions, canonicals, and hreflang. Public introductions are readable without signing in; private APIs still enforce workspace access. |
+| Social metadata                                                                             | Each page uses its own absolute URL, localized copy, and the existing 1254×1254 `/loom.png` for Open Graph and Twitter Cards.                                                                                                                                    |
+| JSON-LD                                                                                     | `Organization` and `WebSite` describe the actual brand, site, language, and logo. Escape `<` before output. Do not invent ratings, reviews, addresses, commercial offers, or available AI capabilities.                                                          |
+| `/robots.txt`                                                                               | Allows public crawling and links to the sitemap. Authentication, private caching rules, and response indexing headers protect private resources; robots rules do not grant or enforce access.                                                                    |
+| `/sitemap.xml`                                                                              | Lists the twelve public canonical URLs. Excludes private account pages, authentication callbacks, orders, and payment APIs. Omits `lastmod` when there is no reliable content modification date.                                                                 |
+| `/llms.txt`                                                                                 | A Markdown site overview with links to the six public pages and the full text feed, intended for agents that support this convention.                                                                                                                            |
+| `/llms-full.txt`                                                                            | Concise public page descriptions covering product direction, work plans, payment mode, and capability boundaries. Reads public mode configuration without reading sessions or the database.                                                                      |
+
+The implementation uses the official Next.js [Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [robots](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots), [sitemap](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap), and [JSON-LD guidance](https://nextjs.org/docs/app/guides/json-ld).
 
 ## SEO 与 GEO 的实际边界
 

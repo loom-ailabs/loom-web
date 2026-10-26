@@ -14,10 +14,11 @@ import {
   Check,
   Command,
   Layers3,
-  Monitor,
+  PencilLine,
   Sparkles,
 } from "lucide-react";
 import { HeroBanner } from "./hero-banner";
+import { PlatformIntroduction } from "./platform-introduction";
 import { AccountMenu, AccountProfile } from "./profile-menu";
 import { ProductWorkspace, useProductAccess } from "@/features/product-workspace";
 
@@ -66,24 +67,24 @@ export function HomePage({
   const capabilities = [
     {
       number: "01",
-      icon: Monitor,
+      icon: PencilLine,
       title: t("capability1Title"),
       body: t("capability1Body"),
-      label: "ACROSS YOUR TOOLS",
+      label: t("capability1Label"),
     },
     {
       number: "02",
       icon: Layers3,
       title: t("capability2Title"),
       body: t("capability2Body"),
-      label: "CONTEXT THAT CONNECTS",
+      label: t("capability2Label"),
     },
     {
       number: "03",
       icon: Sparkles,
       title: t("capability3Title"),
       body: t("capability3Body"),
-      label: "FROM THOUGHT TO ACTION",
+      label: t("capability3Label"),
     },
   ];
   return (
@@ -142,9 +143,7 @@ export function HomePage({
         {view === "home" && <HeroBanner />}
         {(view === "home" || view === "vision") && (
           <section className="pt-20 sm:pt-28">
-            <p className="mb-4 font-mono text-xs tracking-widest text-link">
-              BUILT AROUND YOUR FLOW
-            </p>
+            <p className="mb-4 font-mono text-xs tracking-widest text-link">{t("visionLabel")}</p>
             <h2 className="max-w-3xl text-3xl leading-snug font-medium tracking-tight sm:text-4xl">
               {t("visionTitle")}
               <br />
@@ -167,6 +166,7 @@ export function HomePage({
             </div>
           </section>
         )}
+        {(view === "home" || view === "vision") && <PlatformIntroduction />}
         {(view === "home" || view === "workspace") && (
           <ProductWorkspace access={access} billingMode={billingMode} />
         )}
@@ -175,7 +175,7 @@ export function HomePage({
             <div className="grid gap-10 lg:grid-cols-3">
               <div>
                 <p className="mb-3 font-mono text-xs tracking-widest text-link">
-                  02 / START EXPLORING
+                  {t("pricingLabel")}
                 </p>
                 <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
                   {t("pricingTitle")}
@@ -254,9 +254,7 @@ export function HomePage({
         )}
         {view === "home" && (
           <section className="loom-glass my-12 rounded-2xl px-6 py-16 text-center sm:my-16 sm:py-20">
-            <p className="mb-5 font-mono text-xs tracking-widest text-link">
-              THE NEXT THREAD STARTS WITH YOU
-            </p>
+            <p className="mb-5 font-mono text-xs tracking-widest text-link">{t("flowLine")}</p>
             <h2 className="text-3xl font-medium tracking-tight sm:text-5xl">{t("closingTitle")}</h2>
             <Button asChild size="lg" className="mt-8">
               <Link href="/workspace">

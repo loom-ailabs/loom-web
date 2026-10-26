@@ -117,6 +117,9 @@ export function createLlmsIndex(locale: Locale, billingMode: PaymentMode = "test
 }
 export function createLlmsFullText(locale: Locale, billingMode: PaymentMode = "test") {
   const m = getSeoMessages(locale);
+  const questions = m.faq.items
+    .map(({ question, answer }) => `### ${question}\n\n${answer}`)
+    .join("\n\n");
   return `# ${SITE_NAME} ${m.publicTitle}\n\n> ${m.privateBoundary}\n\n${publicPagesForLocale(
     locale,
     billingMode,
@@ -125,7 +128,7 @@ export function createLlmsFullText(locale: Locale, billingMode: PaymentMode = "t
       (page) =>
         `## ${page.label}\n\n${m.pageLabel}: ${publicPageUrl(page.path, locale)}\n\n${page.content}`,
     )
-    .join("\n\n")}\n`;
+    .join("\n\n")}\n\n## ${m.faq.title}\n\n${questions}\n`;
 }
 export const publicTextHeaders = {
   "Content-Type": "text/plain; charset=utf-8",

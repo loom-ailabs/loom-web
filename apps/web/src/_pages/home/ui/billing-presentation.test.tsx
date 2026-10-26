@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { ComponentProps } from "react";
 import { NextIntlClientProvider } from "@hotkey-tools/i18n";
 import { getMessagesForLocale } from "@hotkey-tools/i18n/server";
+import { getSeoMessages } from "@hotkey-tools/i18n/seo";
 import { describe, expect, it, vi } from "vitest";
 import { HomePage } from "./home-page";
 
@@ -44,6 +45,14 @@ describe("server-rendered product billing copy", () => {
           expect(markup).toContain(messages.Common.privacy);
           expect(markup).toContain(messages.Common.terms);
           expect(markup).not.toContain("Stripe");
+          if (view === "home" || view === "vision") {
+            const { faq } = getSeoMessages(locale);
+            const document = new DOMParser().parseFromString(markup, "text/html");
+            for (const { question, answer } of faq.items) {
+              expect(document.body.textContent).toContain(question);
+              expect(document.body.textContent).toContain(answer);
+            }
+          }
           if (view !== "vision") {
             if (mode === "live") expect(markup).toContain("USD 1.00");
             else {

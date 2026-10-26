@@ -1,5 +1,11 @@
 # loom-web
 
+**Everyday AI. For everyone.**
+
+Loom AI is building simple ways for anyone to use AI in daily life. Our goal is to bring practical AI tools, templates, skills, and plugins together around the things people want to do: write something, learn something, or make everyday tasks easier. No technical background should stand between someone and a useful result.
+
+The current site introduces this vision and offers curated work plans for reading and planning. The workspace does not yet run AI models, create files, or take actions in external tools. New purchases use Creem Test mode and do not incur real charges.
+
 [loom-web](https://github.com/loom-ailabs/loom-web) contains the Loom AI product homepage and workspace (`apps/web`), along with the sign-in and purchase application (`apps/identity`). Each application uses Next.js/OpenNext to serve pages and same-origin APIs. They share sign-in sessions, Logto identities, and Cloudflare D1 entitlements under `.loom-labs.ai`. The default `mise run dev` command still starts the account and purchase application; use `mise run dev-web` for the main site.
 
 See the [Identity application guide](apps/identity/README.md) for setup, identity provider configuration, and payment integration testing. Repository conventions are documented in [AGENTS.md](AGENTS.md).

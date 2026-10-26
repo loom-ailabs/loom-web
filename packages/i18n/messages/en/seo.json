@@ -1,18 +1,18 @@
 {
-  "description": "Connecting intelligence. Crafting tomorrow. Discover the Loom AI vision and explore creative-tool product planning in your workspace.",
+  "description": "Loom AI is building a simpler way to use AI for writing, learning, and everyday tasks. Explore our vision for practical tools and ready-to-use templates.",
   "brandImageAlt": "Loom AI brand mark",
   "pages": {
     "home": {
-      "title": "Loom AI · Connecting Intelligence. Crafting Tomorrow.",
+      "title": "Loom AI | Everyday AI for Everyone",
       "label": "Home",
-      "description": "Connecting intelligence. Crafting tomorrow. Discover the Loom AI vision and explore creative-tool product planning in your workspace.",
-      "content": "Loom AI aims to connect context across desktop, browser, and editor tools so people and intelligence can collaborate. Discover the vision, explore the workspace, and unlock a creative-tool work plan with Loom Pro."
+      "description": "Loom AI is building a simpler way to use AI for writing, learning, and everyday tasks. Explore our vision for practical tools and ready-to-use templates.",
+      "content": "Loom AI is building a simpler way to use AI for writing, learning, and everyday tasks. Our goal is to bring practical AI tools, ready-to-use templates, skills, and plugins into guided experiences that require no technical background. Today, you can explore our vision and workspace, and unlock a curated plan for building a creative tool with Loom Pro. Work plans are for reading and planning; they do not run AI tools or complete tasks for you."
     },
     "vision": {
-      "title": "Our Vision · Loom AI",
+      "title": "Our Vision: Making Everyday AI Easier | Loom AI",
       "label": "Our vision",
-      "description": "Discover how Loom AI aims to connect tools and context, turning scattered discoveries into clear next steps.",
-      "content": "Our vision is to carry ideas beyond a single window, let context flow across familiar tools, and help people turn thoughts into action together with intelligence. Desktop, browser, and editor experiences are the connections Loom AI is exploring."
+      "description": "We want everyone to benefit from AI. Discover our vision for simple, guided experiences built around what you want to do, with no technical background needed.",
+      "content": "Everyday AI. For everyone. Loom AI aims to make useful AI accessible to people without a technical background. We are working toward guided experiences for writing, learning, creative projects, and everyday tasks. Practical tools, templates, skills, and plugins will handle the complexity behind the scenes, so people can start with what they want to do instead of learning about models, prompts, and setup. These experiences are our product direction; the current workspace offers curated reading and planning content."
     },
     "workspace": {
       "title": "Loom Workspace · From Idea to Action",
@@ -51,5 +51,26 @@
     "pricingDescription": "Explore Loom AI for free or unlock the Loom Pro work plan for USD 1.00 with a one-time purchase through Creem. No subscription or automatic renewal.",
     "pricingContent": "Loom Explore offers free access to the vision and workspace introduction. Loom Pro costs USD 1.00 as a one-time purchase through Creem’s hosted checkout and unlocks the creative-tool work plan. Access is saved to your account, with no subscription or automatic renewal.",
     "boundary": "Work plans are curated by Loom for reading and planning, without automated execution. Loom Pro is available for USD 1.00 as a one-time purchase through Creem’s hosted checkout."
+  },
+  "faq": {
+    "title": "A few things to know",
+    "items": [
+      {
+        "question": "Who is Loom AI for?",
+        "answer": "Loom AI is for anyone who wants help with writing, learning, and everyday tasks, including people trying AI for the first time. We are building around everyday needs, with no technical background required."
+      },
+      {
+        "question": "Do I need to understand how AI works?",
+        "answer": "No. Our goal is to make AI useful without asking you to learn about models or technical terms. You should be able to start with what you want to do and follow clear, simple steps."
+      },
+      {
+        "question": "Will I need to write prompts or install plugins?",
+        "answer": "We're designing these tools so you won't need to write prompts or install plugins yourself. Our goal is to guide you through each task in a few clear steps."
+      },
+      {
+        "question": "What can I use today?",
+        "answer": "You can explore the Loom AI vision and workspace, sign in, and unlock a curated plan for building a creative tool with Loom Pro. The current plans are for reading and planning; they do not call AI models, create files, or perform external actions. Guided AI tools are part of our product direction."
+      }
+    ]
   }
 }

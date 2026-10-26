@@ -33,7 +33,9 @@ export function ProductWorkspace({
     <section id="workspace" className="py-20 sm:py-28">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="mb-3 font-mono text-xs tracking-widest text-link">01 / THE WORKSPACE</p>
+          <p className="mb-3 font-mono text-xs tracking-widest text-link">
+            {t("workspaceLabelTag")}
+          </p>
           <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">{t("workTitle")}</h2>
         </div>
         <p className="max-w-sm text-sm leading-6 text-muted-foreground">{t("workBody")}</p>
@@ -60,9 +62,7 @@ export function ProductWorkspace({
               {t("planTitle")}
             </div>
             <div className="mt-24 border-t px-3 pt-4 text-xs leading-6 text-muted-foreground">
-              Connecting intelligence.
-              <br />
-              Crafting tomorrow.
+              {t("footerVision")}
             </div>
           </aside>
           <div className="p-6 sm:p-10 md:col-span-3">
